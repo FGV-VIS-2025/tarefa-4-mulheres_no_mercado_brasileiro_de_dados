@@ -1,0 +1,119 @@
+('P0', 'id')
+('P1_a ', 'Idade')
+('P1_a_a ', 'Faixa idade')
+('P1_b ', 'Genero')
+('P1_e ', 'Estado onde mora')
+('P1_e_a ', 'uf onde mora')
+('P1_e_b ', 'Regiao onde mora')
+('P1_g_b ', 'Regiao de origem')
+('P1_g_c ', 'Mudou de Estado?')
+('P1_h ', 'Nivel de Ensino')
+('P1_i ', 'Área de Formação')
+('P2_a ', 'Qual sua situação atual de trabalho?')
+('P2_b ', 'Setor')
+('P2_c ', 'Numero de Funcionarios')
+('P2_d ', 'Gestor?')
+('P2_e ', 'Cargo como Gestor')
+('P2_f ', 'Cargo Atual')
+('P2_g ', 'Nivel')
+('P2_h ', 'Faixa salarial')
+('P2_i ', 'Quanto tempo de experiência na área de dados você tem?')
+('P2_j ', 'Quanto tempo de experiência na área de TI/Engenharia de Software você teve antes de começar a trabalhar na área de dados?')
+('P2_k ', 'Você está satisfeito na sua empresa atual?')
+('P2_l ', 'Qual o principal motivo da sua insatisfação com a empresa atual?')
+('P2_l_a ', 'Falta de oportunidade de crescimento no emprego atual')
+('P2_l_b ', 'Salário atual não corresponde ao mercado')
+('P2_l_c ', 'Não tenho uma boa relação com meu líder/gestor')
+('P2_l_d ', 'Gostaria de trabalhar em em outra área de atuação')
+('P2_l_e ', 'Gostaria de receber mais benefícios')
+('P2_l_f ', 'O clima de trabalho/ambiente não é bom')
+('P2_l_g ', 'Falta de maturidade analítica na empresa')
+('P2_m ', 'Você participou de entrevistas de emprego nos últimos 6 meses?')
+('P2_n ', 'Você pretende mudar de emprego nos próximos 6 meses?')
+('P2_o ', 'Quais os principais critérios que você leva em consideração no momento de decidir onde trabalhar?')
+('P2_o_a ', 'Remuneração/Salário')
+('P2_o_b ', 'Benefícios')
+('P2_o_c ', 'Propósito do trabalho e da empresa')
+('P2_o_d ', 'Flexibilidade de trabalho remoto')
+('P2_o_e ', 'Ambiente e clima de trabalho')
+('P2_o_f ', 'Oportunidade de aprendizado e trabalhar com referências na área')
+('P2_o_g ', 'Plano de carreira e oportunidades de crescimento profissional')
+('P2_o_h ', 'Maturidade da empresa em termos de tecnologia e dados')
+('P2_o_i ', 'Qualidade dos gestores e líderes')
+('P2_o_j ', 'Reputação que a empresa tem no mercado')
+('P2_q ', 'Atualmente qual a sua forma de trabalho?')
+('P2_r ', 'Qual a forma de trabalho ideal para você?')
+('P2_s ', 'Caso sua empresa decida pelo modelo 100% presencial qual será sua atitude?')
+('P3_a ', 'Qual o número aproximado de pessoas que atuam com dados na sua empresa hoje?')
+('P3_b ', 'Quais desses papéis/cargos fazem parte do time (ou chapter) de dados da sua empresa?')
+('P3_b_a ', 'Analytics Engineer')
+('P3_b_b ', 'Engenharia de Dados/Data Engineer')
+('P3_b_c ', 'Analista de Dados/Data Analyst')
+('P3_b_d ', 'Cientista de Dados/Data Scientist')
+('P3_b_e ', 'Database Administrator/DBA')
+('P3_b_f ', 'Analista de Business Intelligence/BI')
+('P3_b_g ', 'Arquiteto de Dados/Data Architect')
+('P3_b_h ', 'Data Product Manager/DPM')
+('P3_b_i ', 'Business Analyst')
+('P3_c ', 'Quais dessas responsabilidades fazem parte da sua rotina atual de trabalho como gestor?')
+('P3_c_a ', 'Pensar na visão de longo prazo de dados da empresa e fortalecimento da cultura analítica da companhia.')
+('P3_c_b ', 'Organização de treinamentos e iniciativas com o objetivo de aumentar a maturidade analítica das áreas de negócios.')
+('P3_c_c ', 'Atração, seleção e contratação de talentos para o time de dados.')
+('P3_c_d ', 'Decisão sobre contratação de ferramentas e tecnologias relacionadas a dados.')
+('P3_c_e ', 'Sou gestor da equipe responsável pela engenharia de dados e por manter o Data Lake da empresa como fonte única dos dados, garantindo a qualidade e confiabilidade da informação.')
+('P3_c_f ', 'Sou gestor da equipe responsável pela entrega de dados, estudos, relatórios e dashboards para as áreas de negócio da empresa.')
+('P3_c_g ', 'Sou gestor da equipe responsável por iniciativas e projetos envolvendo Inteligência Artificial e Machine Learning.')
+('P3_c_h ', 'Apesar de ser gestor ainda atuo na parte técnica, construindo soluções/análises/modelos etc.')
+('P3_c_i ', 'Gestão de projetos de dados, cuidando das etapas, equipes envolvidas, atingimento dos objetivos etc.')
+('P3_c_j ', 'Gestão de produtos de dados, cuidando da visão dos produtos, backlog, feedback de usuários etc.')
+('P3_c_k ', 'Gestão de pessoas, apoio no desenvolvimento das pessoas, evolução de carreira')
+('P3_d ', 'Quais são os 3 maiores desafios que você tem como gestor no atual momento?')
+('P3_d_ ', 'a Contratar novos talentos.')
+('P3_d_ ', 'b Reter talentos.')
+('P3_d_ ', 'c Convencer a empresa a aumentar os investimentos na área de dados.')
+('P3_d_ ', 'd Gestão de equipes no ambiente remoto.')
+('P3_d_ ', 'e Gestão de projetos envolvendo áreas multidisciplinares da empresa.')
+('P3_d_ ', 'f Organizar as informações e garantir a qualidade e confiabilidade.')
+('P3_d_ ', 'g Conseguir processar e armazenar um alto volume de dados.')
+('P3_d_ ', 'h Conseguir gerar valor para as áreas de negócios através de estudos e experimentos.')
+('P3_d_ ', 'i Desenvolver e manter modelos Machine Learning em produção.')
+('P3_d_ ', 'j Gerenciar a expectativa das áreas de negócio em relação as entregas das equipes de dados.')
+('P3_d_ ', 'k Garantir a manutenção dos projetos e modelos em produção, em meio ao crescimento da empresa.')
+('P3_d_l ', 'Conseguir levar inovação para a empresa através dos dados.')
+('P3_d_m ', 'Garantir retorno do investimento (ROI) em projetos de dados.')
+('P3_d_n ', 'Dividir o tempo entre entregas técnicas e gestão.')
+('P4_a_a ', 'Mesmo que esse não seja seu cargo formal, você considera que sua atuação no dia a dia, reflete alguma das opções listadas abaixo?')
+('P4_a ', 'Atuacao')
+"('P6_h_f ', 'Desenvolvendo/cuidando da manutenção de repositórios de dados baseados em streaming de eventos como Data Lakes e Data Lakehouses.')",
+"('P6_h_g ', 'Atuando na modelagem dos dados, com o objetivo de criar conjuntos de dados como Data Warehouses, Data Marts etc.')",
+"('P6_h_h ', 'Cuidando da qualidade dos dados, metadados e dicionário de dados.')",
+"('P6_h_i ', 'Nenhuma das opções listadas refletem meu dia a dia.')",
+"('P6_i ', 'Quais ferramentas de Business Intelligence você utiliza no trabalho?')",
+"('P6_i_a ', 'Microsoft PowerBI')",
+"('P6_i_b ', 'Qlik View/Qlik Sense')",
+"('P6_i_c ', 'Tableau')",
+"('P6_i_d ', 'Metabase')",
+"('P6_i_e ', 'Superset')",
+"('P6_i_f ', 'Redash')",
+"('P6_i_g ', 'MicroStrategy')",
+"('P6_i_h ', 'IBM Analytics/Cognos')",
+"('P6_i_i ', 'SAP Business Objects')",
+"('P6_i_j ', 'Oracle Business Intelligence')",
+"('P6_i_k ', 'Amazon QuickSight')",
+"('P6_i_l ', 'Salesforce/Einstein Analytics')",
+"('P6_i_m ', 'Mode')",
+"('P6_i_n ', 'Alteryx')",
+"('P6_i_o ', 'Birst')",
+"('P6_i_p ', 'Looker')",
+"('P6_i_q ', 'Google Data Studio')",
+"('P6_i_r ', 'SAS Visual Analytics')",
+"('P6_i_s ', 'Grafana')",
+"('P6_i_t ', 'TIBCO Spotfire')",
+"('P6_i_u ', 'Pentaho')",
+"('P6_i_v ', 'Fazemos todas as análises utilizando apenas Excel ou planilhas do google')",
+"('P6_i_x ', 'Não utilizo nenhuma ferramenta de BI no trabalho')",
+"('P7 ', 'Você se considera preparado para os desafios do trabalho com dados?')",
+"('P8 ', 'Quais as habilidades você acredita que precisa melhorar para avançar na sua carreira como profissional de dados?')",
+"('P9 ', 'O que você acredita ser o maior desafio do mercado de dados no Brasil atualmente?')",
+"('P10 ', 'Qual sua expectativa em relação à evolução da área de dados nos próximos 5 anos?')"
+
