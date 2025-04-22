@@ -1,8 +1,9 @@
+
 body {
-    font-family: 'Helvetica', sans-serif;
+    background-color:  #F2F1F0;
+    overflow-x: hidden;
     margin: 0;
-    background: #f9f9f9;
-    color: #222;
+    font-family: 'Helvetica', sans-serif;
 }
 
 #tooltip {
@@ -17,25 +18,30 @@ body {
     z-index: 9999;
 }
 
+
 #graphic {
+    margin: auto;
+    width: 1500px;
     display: flex;
     flex-direction: row;
-    max-width: 1200px;
-    margin: auto;
-    padding: 40px 20px;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 #sections {
     width: 30%;
     padding-right: 40px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
+    position: relative;
+    top: 20px;
 }
 
+
 .step {
-    margin-bottom: 80px;
+    margin-bottom: 100px;
+    height: 700px;
+    line-height: 1.4em;
+    font-size: 16px;
+    text-align: justify;
     opacity: 0.3;
     transition: opacity 0.4s ease;
 }
@@ -46,6 +52,8 @@ body {
 
 #vis {
     width: 70%;
-    min-height: 800px;
-    position: relative;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* o gráfico fica fixo enquanto o texto rola */
 }

@@ -1,9 +1,8 @@
 // scroller.js
 // Controla o efeito de scroll interativo:
-
 // Detecta em qual “passo” da rolagem o usuário está (.step).
-
 // Emite eventos active e progress, usados para acionar funções que atualizam os gráficos dinamicamente.
+
 
 function scroller() {
 
@@ -24,20 +23,25 @@ function scroller() {
 
     //função que detecta em qual seção da tela o usuário está agora
     function position() {
-        let pos = window.pageYOffset;
-        let sectionIndex = 0;
+        let pos = window.pageYOffset; // distância do topo da janela atual até o topo do documento.
+        let sectionIndex = 0;  // seção ativa no momento
+        let minDist = Infinity;  //usado para comparar qual seção está mais próxima do centro da tela
 
+        //Se o usuário está no topo da página, força o sectionIndex para 0.
+        if (pos === 0) {
+            sectionIndex = 0;
+        }   
+        // Para cada step, calcula sua posição relativa à tela. Quando o top da seção fica acima de 50% da altura da tela, ela é considerada "ativa".  Isso é o que sincroniza a rolagem com os gráficos.
+            else {
+            sections.each(function(d, i) {
+                let top = this.getBoundingClientRect().top;
+                if (top < window.innerHeight * 0.5) {
+                    sectionIndex = i;
+                }
+            });
+        }
 
-        // Usa getBoundingClientRect().top para ver a distância do topo da seção até o topo da tela.Quando essa distância for menor que metade da altura da tela (window.innerHeight * 0.5), considera que essa é a seção "ativa".
-        sections.each(function(d, i) {
-            let top = this.getBoundingClientRect().top;
-            if (top < window.innerHeight * 0.5) {
-                sectionIndex = i;
-            }
-        });
-
-
-        //se o usuário entrou em uma nova seção, Atualiza o `currentIndex`, Dispara o evento active informando qual seção ficou ativa
+        // se o usuário entrou em uma nova seção, Atualiza o `currentIndex`, Dispara o evento active informando qual seção ficou ativa
         if (sectionIndex !== currentIndex) {
             currentIndex = sectionIndex;
             sections.classed("active", (d, i) => i === currentIndex);
@@ -45,7 +49,7 @@ function scroller() {
         }
     }
 
-    // Permite que o usuário do scroller() defina funções que devem ser chamadas quando eventos forem disparados (como active).
+    // Permite chamar scroll.on('active', callback) para definir o que deve acontecer quando uma nova seção fica ativa.
     scroll.on = function(event, callback) {
         dispatch.on(event, callback);
     };
@@ -53,11 +57,37 @@ function scroller() {
     return scroll;
 }
 
-//scroll() ativa o sistema de scroll, associando o comportamento ao window
-let scroll = scroller().on("active", function(index) {
-    console.log("Scrolled to section:", index);
-});
+
+// Cria uma instância do scroller.
+let scroll = scroller().container(d3.select('#graphic'));
+//Chama scroll() para ativar o sistema.
 scroll();
+
+
+//Guarda o índice anterior e atual, para saber se rolou para frente ou para trás.
+let lastIndex = -1;
+let activeIndex = 0;
+
+
+// Quando uma nova seção fica ativa:
+scroll.on('active', function(index) {
+
+    //   - Atualiza a opacidade das seções para destacar a atual.
+    d3.selectAll('.step')
+        .transition().duration(500)
+        .style('opacity', (d, i) => i === index ? 1 : 0.1);
+
+    //   - Ativa as funções de visualização correspondentes
+    activeIndex = index;
+    let sign = activeIndex - lastIndex < 0 ? -1 : 1;
+    let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
+    
+    scrolledSections.forEach(i => {
+        activationFunctions[i]();
+    });
+
+    lastIndex = activeIndex;
+});
 
 
 //Com isso podemos associar diferentes draw functions ao índice da seção
