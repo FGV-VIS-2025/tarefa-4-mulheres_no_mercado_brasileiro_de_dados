@@ -1,0 +1,73 @@
+<!-- index.html
+A estrutura da visualização e dos textos estática é definida em seções (<section class="step">).
+
+Elementos como #vis, #graphic, #tooltip são usados pelo D3.js para desenhar os gráficos dinamicamente.
+
+São importados os arquivos:
+
+style.css: define o estilo da página.
+
+scroller.js e sections.js: lógica da rolagem e da visualização. -->
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T4-vis</title>
+
+    <!-- CSS para estilos -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+
+    <!-- Biblioteca para personalizar legenda -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+
+</head>
+<body>
+
+    <!-- Tooltip para exibir dados ao passar o mouse, especificado no sections.js -->
+    <div id="tooltip" style="display: none;"></div>
+
+    <!-- Container geral -->
+    <div id="graphic">
+
+        <!-- Texto e seções de rolagem -->
+        <div id="sections">
+            <section class="step">
+                <h1>Mulheres no mercado brasileiro de dados</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quod et nemo quidem maxime adipisci unde veritatis cumque consequatur quae, ullam maiores laborum suscipit quam? Id voluptatum ipsa sunt possimus eveniet?.</p>
+                <p>Role para baixo para explorar!</p>
+            </section>
+
+            <section class="step">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium voluptatibus amet at. Aspernatur recusandae libero consectetur eaque tenetur dolorem eligendi, itaque possimus explicabo laudantium optio quo ratione reprehenderit necessitatibus ut!.</p>
+            </section>
+
+            <section class="step">
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita earum facilis, aliquid accusamus optio laudantium aut quis deleniti similique ipsum quo consectetur autem aperiam, assumenda libero cupiditate enim! Odio, ab!</p>
+            </section>
+
+            <section class="step">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab autem odit labore nulla aliquid excepturi temporibus eligendi optio animi numquam deserunt, incidunt quidem iste exercitationem quos nostrum! Neque, nostrum officia!.</p>
+            </section>
+
+            <section class="step">
+                <h2>O fim</h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, ea odit. Accusamus nemo modi iste ipsam quo corporis cumque alias natus, voluptas dignissimos nostrum repudiandae, dolores distinctio, inventore dolore obcaecati.</p>
+            </section>
+        </div>
+
+        <!-- Onde os gráficos D3 aparecerão -->
+        <div id="vis"></div>
+    </div>
+
+    <!-- Scripts personalizados -->
+    <script src="scroller.js"></script>
+    <script src="sections.js"></script>
+
+</body>
+</html>
