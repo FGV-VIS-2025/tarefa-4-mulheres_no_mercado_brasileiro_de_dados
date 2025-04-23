@@ -6,6 +6,8 @@
 // // Define funções draw1(), draw2(), etc. que são chamadas conforme o usuário rola.
 // // clean() esconde elementos que não são necessários em cada estado.
 
+// import scroller from './scroller.js'
+
 
 
 let svg;
@@ -338,7 +340,7 @@ function drawLine() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset1, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, d3.min(dataset1, d => d.Feminino - d.Masculino)]);
+        .range([height, 110]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -346,7 +348,7 @@ function drawLine() {
             d3.max(dataset1, d => d.Feminino - d.Masculino)
         ])
         .nice()
-        .range([height, 0]);
+        .range([height-400, 0]);
 
     // Eixos
     svg.append("g")
