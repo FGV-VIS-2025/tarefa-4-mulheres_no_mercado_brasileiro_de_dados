@@ -52,10 +52,18 @@ function scroller() {
     // Permite chamar scroll.on('active', callback) para definir o que deve acontecer quando uma nova seção fica ativa.
     scroll.on = function(event, callback) {
         dispatch.on(event, callback);
+        return scroll;
+    };
+
+    scroll.container = function(value) {
+        if (!arguments.length) return container;
+        container = value;
+        return scroll;
     };
 
     return scroll;
 }
+
 
 
 // Cria uma instância do scroller.
