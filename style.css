@@ -85,7 +85,9 @@ body {
     position: sticky;
     top: 0;
     height: 100vh;
-    /* o gráfico fica fixo enquanto o texto rola */
+    display: flex;
+    align-items: center; /* centraliza verticalmente */
+    justify-content: center; /* opcional, se quiser centralizar horizontalmente */
 }
 
 .scroll-indicator {
