@@ -24,7 +24,7 @@ let x, y, radius, color;
 // Carregar dados
 d3.csv("grouped_income_gender.csv").then(data => {
     dataset1 = data.map(d => ({
-        faixa_salarial: d.faixa_salarial.trim(),
+        faixa_salarial: d.salario,
         Masculino: +d.Masculino,
         Feminino: +d.Feminino,
         Diff: +(d.Feminino - d.Masculino),
@@ -110,13 +110,16 @@ function clean() {
 
 
 function drawPyr() {
+    // limpa os eixos
     clean();
     const categorias = dataset.map(d => d.faixa_salarial);
 
+    // cálculo do salário médio
     const maxValue = d3.max(dataset, d => Math.max(Math.abs(d.Feminino), d.Masculino));
     let salarioMediaMulher = d3.sum(dataset, d => Math.abs(d.Feminino) * d.faixa_salarial)/d3.sum(dataset,  d=>Math.abs(d.Feminino)); 
     let salarioMedioHomem = d3.sum(dataset, d => d.Masculino * d.faixa_salarial)/d3.sum(dataset,  d=>Math.abs(d.Masculino));
 
+    // mapeia os valores para o domínio da tela
     const x = d3.scaleLinear()
         .domain([-maxValue, maxValue])
         .range([0, width]);
@@ -126,19 +129,22 @@ function drawPyr() {
         .range([height,0])
         .padding(0.1);
 
+    // eixo x embaixo
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x).ticks(5).tickFormat(d => Math.abs(d)));
 
+    // eixo y a esquerda
     svg.append("g")
         .call(d3.axisLeft(y));
-
+    
+    // barra feminina a esquerda
     svg.selectAll(".bar-f")
         .data(dataset)
         .enter()
         .append("rect")
         .attr("class", "bar-f")
-        .attr("x", d => x(d.Feminino)+13)
+        .attr("x", d => x(d.Feminino))
         .attr("y", d => y(d.faixa_salarial))
         .attr("width", d => x(0) - x(d.Feminino))
         .attr("height", y.bandwidth())
@@ -165,7 +171,8 @@ function drawPyr() {
             d3.select(this).attr("fill", "#ff69b4");
         });
 
-    svg.selectAll(".bar-m")
+        // barra masculina a direita
+        svg.selectAll(".bar-m")
         .data(dataset)
         .enter()
         .append("rect")
@@ -177,18 +184,18 @@ function drawPyr() {
         .attr("fill", "#1e90ff")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
-                .style("display", "block")
+            .style("display", "block")
                 .html(`
                     <strong>Salário:</strong> R$ ${d.faixa_salarial},00<br>
                     <strong>Quantidade:</strong> ${d.Masculino}
                 `);
             d3.select(this)
-                .attr("fill", "#339999");
+            .attr("fill", "#339999");
         })
         // - MOve tooltip com o mouse
         .on("mousemove", function(event) {
             d3.select("#tooltip")
-                .style("left", (event.pageX + 10) + "px")
+            .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
         // - Retira tooltip quando o mouse sai
@@ -196,7 +203,8 @@ function drawPyr() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", "#1e90ff");
         });
-
+    
+    // adiciona os textos 
     svg.append("text")
         .attr("x", width / 4)
         .attr("y", height + 40)
@@ -208,14 +216,97 @@ function drawPyr() {
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
         .text("Masculino");
+    
+    // define escala y contínua para a linha de salário médio
+    const maxSalario = d3.max(dataset, d => d.faixa_salarial);
+    const y1 = d3.scaleLinear()
+    .domain([0, maxSalario])
+    .range([height, 0]);    
+    
+    // linha horizontal no salário médio feminino (esquerda)
+    svg.append("line")
+    .attr("x1", x(-maxValue))
+    .attr("x2", x(0))
+    .attr("y1", y1(salarioMediaMulher))
+    .attr("y2", y1(salarioMediaMulher))
+    .attr("stroke", "black")
+    .attr("stroke-width", 3)
+    // pontilhado
+    .attr("stroke-dasharray", "4,4");
 
-       
-    // TODO colocar uma linha onde esta a média de salário feminina e masculina
+    // linha invisível, só para p tooltip
+    svg.append("line")
+    .attr("x1", x(0))
+    .attr("x2", x(-maxValue))
+    .attr("y1", y1(salarioMediaMulher))
+    .attr("y2", y1(salarioMediaMulher))
+    .attr("stroke", "black")
+    // maior para facilitar hover
+    .attr("stroke-width", 15) 
+    // invisível
+    .attr("stroke-opacity", 0) 
+    .style("cursor", "pointer")
+    .on("mouseover", function(event) {
+        d3.select("#tooltip")
+            .style("display", "block")
+            .html(`
+                <strong>Salário médio feminino:</strong> R$ ${Math.round(salarioMediaMulher * 10) / 10}
+            `);
+    })
+    .on("mousemove", function(event) {
+        d3.select("#tooltip")
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 20) + "px");
+    })
+    .on("mouseout", function() {
+        d3.select("#tooltip").style("display", "none");
+    });
+
+    // linha horizontal no salário médio masculino (direita)
+    svg.append("line")
+    .attr("x1", x(0))
+    .attr("x2", x(maxValue))
+    .attr("y1", y1(salarioMedioHomem))
+    .attr("y2", y1(salarioMedioHomem))
+    .attr("stroke", "black")
+    .attr("stroke-width", 3)
+    // pontilhado
+    .attr("stroke-dasharray", "4,4");
+
+    // linha invisível, só parao tooltip
+    svg.append("line")
+    .attr("x1", x(0))
+    .attr("x2", x(maxValue))
+    .attr("y1", y1(salarioMedioHomem))
+    .attr("y2", y1(salarioMedioHomem))
+    .attr("stroke", "black")
+    // maior para facilitar hover
+    .attr("stroke-width", 15) 
+    // invisível
+    .attr("stroke-opacity", 0) 
+    .style("cursor", "pointer")
+    .on("mouseover", function(event) {
+        d3.select("#tooltip")
+            .style("display", "block")
+            .html(`
+                <strong>Salário médio masculino:</strong> R$ ${Math.round(salarioMedioHomem * 10) / 10}
+            `);
+    })
+    .on("mousemove", function(event) {
+        d3.select("#tooltip")
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 20) + "px");
+    })
+    .on("mouseout", function() {
+        d3.select("#tooltip").style("display", "none");
+    });
+
 }
 
 
 function drawLine() {
-    clean(); // Limpa o SVG
+    // Limpa o SVG
+    clean(); 
 
     // Escalas para os dois gráficos
     const x = d3.scaleBand()
@@ -332,7 +423,7 @@ function drawLine() {
             : yDiff(0))
         .attr("width", x.bandwidth())
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
-        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#1e90ff" : "#ff69b4"))
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -347,7 +438,7 @@ function drawLine() {
         })
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#1e90ff" : "#ff69b4"));
+            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 }
 
@@ -470,7 +561,7 @@ function drawLine2() {
             : yDiff(0))
         .attr("width", x.bandwidth())
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
-        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#1e90ff" : "#ff69b4"))
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -485,7 +576,7 @@ function drawLine2() {
         })
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#1e90ff" : "#ff69b4"));
+            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 }
 
