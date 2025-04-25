@@ -534,7 +534,6 @@ function drawPyr() {
         });
 }
 
-
 function salarioGenderProp() {
     // Limpa o SVG
     clean(); 
@@ -580,28 +579,40 @@ function salarioGenderProp() {
         .x(d => xLine(d.faixa_salarial.trim()))
         .y(d => yLine(d.Feminino));
 
+    // Linha masculino
     svg.append("path")
         .datum(dataset1)
         .attr("d", lineMasculino)
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
 
+    // Linha feminino
     svg.append("path")
         .datum(dataset1)
         .attr("d", lineFeminino)
         .attr("stroke", "#ff69b4")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas
+    // Pontos nas linhas (masculino)
     svg.selectAll(".circle-male")
         .data(dataset1)
         .enter()
         .append("circle")
         .attr("cx", d => xLine(d.faixa_salarial.trim()))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 4)
+        .attr("r", 0) // começa raio 0
         .attr("fill", "#1e90ff")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -617,15 +628,19 @@ function salarioGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        });
+        })
+        .transition()
+        .duration(800)
+        .attr("r", 4);
 
+    // Pontos nas linhas (feminino)
     svg.selectAll(".circle-female")
         .data(dataset1)
         .enter()
         .append("circle")
         .attr("cx", d => xLine(d.faixa_salarial.trim()))
         .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 4)
+        .attr("r", 0) // começa raio 0
         .attr("fill", "#ff69b4")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -641,7 +656,10 @@ function salarioGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
-        });
+        })
+        .transition()
+        .duration(800)
+        .attr("r", 4);
 
     // Barras de diferença (Feminino - Masculino)
     svg.selectAll("rect")
@@ -649,11 +667,9 @@ function salarioGenderProp() {
         .enter()
         .append("rect")
         .attr("x", d => x(d.faixa_salarial.trim()))
-        .attr("y", d => d.Feminino - d.Masculino >= 0
-            ? yDiff(d.Feminino - d.Masculino)
-            : yDiff(0))
+        .attr("y", yDiff(0)) // começa no meio
         .attr("width", x.bandwidth())
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
+        .attr("height", 0) // altura inicial 0
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
         .on("mouseover", function(event, d) {
@@ -670,7 +686,13 @@ function salarioGenderProp() {
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
-        });
+        })
+        .transition()
+        .duration(1000)
+        .attr("y", d => d.Feminino - d.Masculino >= 0
+            ? yDiff(d.Feminino - d.Masculino)
+            : yDiff(0))
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
 }
 
 
