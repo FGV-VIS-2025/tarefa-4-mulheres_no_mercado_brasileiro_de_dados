@@ -21,6 +21,12 @@ scroller.js e sections.js: lógica da rolagem e da visualização. -->
 
     <!-- Biblioteca para personalizar legenda -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <script src="https://unpkg.com/d3-cloud/build/d3.layout.cloud.js"></script>
+    <script>
+        // Garante compatibilidade com d3-cloud
+        if (!d3.layout) d3.layout = {};
+        d3.layout.cloud = cloud; // cloud é global, exportado pelo script acima
+      </script>
 
 </head>
 <body>
