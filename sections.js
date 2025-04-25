@@ -48,6 +48,42 @@ d3.csv("grouped_salario_abs.csv").then(data => {
     }));
 });
 
+d3.csv("income_gender_experience.csv").then(data => {
+    dataset4 = data.map(d => ({
+        experiencia: d.experiencia_anos,
+        Masculino: +d.Masculino,
+        Feminino: +d.Feminino,
+        // Diff: +(d.Feminino - d.Masculino),
+    }));
+});
+
+d3.csv("income_gender_experience_prop.csv").then(data => {
+    dataset5 = data.map(d => ({
+        experiencia: d.experiencia_anos,
+        Masculino: +d.Masculino,
+        Feminino: +d.Feminino,
+        Diff: +(d.Feminino - d.Masculino),
+    }));
+});
+
+d3.csv("gender_nivel_abs.csv").then(data => {
+    dataset6 = data.map(d => ({
+        nivel: d.Nivel,
+        Masculino: +d.Masculino,
+        Feminino: +d.Feminino,
+        Diff: +(d.Feminino - d.Masculino),
+    }));
+});
+
+d3.csv("gender_nivel_prop.csv").then(data => {
+    dataset7 = data.map(d => ({
+        nivel: d.Nivel,
+        Masculino: +d.Masculino,
+        Feminino: +d.Feminino,
+        Diff: +(d.Feminino - d.Masculino),
+    }));
+});
+
 d3.csv("gender_pyramid.csv").then(data => {
     dataset = data.map(d => ({
         faixa_salarial: +d.salario,
@@ -304,7 +340,7 @@ function drawPyr() {
 }
 
 
-function drawLine() {
+function salarioGenderProp() {
     // Limpa o SVG
     clean(); 
 
@@ -443,7 +479,7 @@ function drawLine() {
 }
 
 
-function drawLine2() {
+function ensinoGenderProp() {
     clean(); // Limpa o SVG
 
     // Escalas para os dois gráficos
@@ -580,7 +616,7 @@ function drawLine2() {
         });
 }
 
-function drawLine3() {
+function ensinoGenderAbsBar() {
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
@@ -665,14 +701,466 @@ function drawLine3() {
     });
 }
 
+function experienciaGenderAbsBar() {
+
+    const subgroups = ["Masculino", "Feminino"];
+    const groups = dataset4.map(d => d.experiencia);
+    console.log(groups);
+
+    clean();
+    // Escala x para os grupos (categorias de ensino)
+    var x = d3.scaleBand()
+      .domain(groups)
+      .range([0, width])
+      .padding([0.2])
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).tickSize(0));
+    
+    var y = d3.scaleLinear()
+      .domain([0, d3.max(dataset4, d => Math.max(d.Masculino, d.Feminino))])
+      .nice()
+      .range([height, 0]);
+
+    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
+
+      svg.append("g")
+      .call(d3.axisLeft(y));
+
+      var xSubgroup = d3.scaleBand()
+    .domain(subgroups)
+    .range([0, x.bandwidth()])
+    .padding([0.05])
+
+    // Cores
+    const color = d3.scaleOrdinal()
+      .domain(subgroups)
+      .range(["#1e90ff", "#ff69b4"]);
+
+    // Eixo X
+    svg.append("g")
+    .selectAll("g")
+    // Enter in data = loop group per group
+    .data(dataset4)
+    .enter()
+    .append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; })
+    .selectAll("rect")
+    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+      .attr("x", function(d) { return xSubgroup(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", xSubgroup.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return color(d.key); });
+ 
+  // Show the bars
+  svg.append("g")
+    .selectAll("g")
+    // Enter in data = loop group per group
+    .data(dataset4)
+    .enter()
+    .append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; })
+    .selectAll("rect")
+    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+      .attr("x", function(d) { return xSubgroup(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", xSubgroup.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return color(d.key); })
+      .on("mouseover", function(event, d) {
+        d3.select("#tooltip")
+            .style("display", "block")
+            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+        d3.select(this).attr("fill", "#339999");
+    })
+    .on("mousemove", function(event) {
+        d3.select("#tooltip")
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 20) + "px");
+    })
+    .on("mouseout", function(event, d) {
+        d3.select("#tooltip").style("display", "none");
+        d3.select(this).attr("fill", function(d) { return color(d.key); });
+    });
+}
+
+function experienciaGenderProp() {
+    // Limpa o SVG
+    clean(); 
+
+    // Escalas para os dois gráficos
+    const x = d3.scaleBand()
+        .domain(dataset5.map(d => d.experiencia))
+        .range([0, width])
+        .padding(0.2);
+
+    const xLine = d3.scalePoint()
+        .domain(dataset5.map(d => d.experiencia))
+        .range([0, width])
+        .padding(0.5);
+
+    const yLine = d3.scaleLinear()
+        .domain([0, d3.max(dataset5, d => Math.max(d.Masculino, d.Feminino))])
+        .nice()
+        .range([height, 110]);
+
+    const yDiff = d3.scaleLinear()
+        .domain([
+            d3.min(dataset5, d => d.Feminino - d.Masculino),
+            d3.max(dataset5, d => d.Feminino - d.Masculino)
+        ])
+        .nice()
+        .range([height-400, 0]);
+
+    // Eixos
+    svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x));
+
+    svg.append("g")
+        .call(d3.axisLeft(yLine));
+
+    // Linhas
+    const lineMasculino = d3.line()
+        .x(d => xLine(d.experiencia))
+        .y(d => yLine(d.Masculino));
+
+    const lineFeminino = d3.line()
+        .x(d => xLine(d.experiencia))
+        .y(d => yLine(d.Feminino));
+
+    svg.append("path")
+        .datum(dataset5)
+        .attr("d", lineMasculino)
+        .attr("stroke", "#1e90ff")
+        .attr("fill", "none")
+        .attr("stroke-width", 2);
+
+    svg.append("path")
+        .datum(dataset5)
+        .attr("d", lineFeminino)
+        .attr("stroke", "#ff69b4")
+        .attr("fill", "none")
+        .attr("stroke-width", 2);
+
+    // Pontos nas linhas
+    svg.selectAll(".circle-male")
+        .data(dataset5)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLine(d.experiencia))
+        .attr("cy", d => yLine(d.Masculino))
+        .attr("r", 4)
+        .attr("fill", "#1e90ff")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
+        });
+
+    svg.selectAll(".circle-female")
+        .data(dataset5)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLine(d.experiencia))
+        .attr("cy", d => yLine(d.Feminino))
+        .attr("r", 4)
+        .attr("fill", "#ff69b4")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
+        });
+
+    // Barras de diferença (Feminino - Masculino)
+    svg.selectAll("rect")
+        .data(dataset5)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.experiencia))
+        .attr("y", d => d.Feminino - d.Masculino >= 0
+            ? yDiff(d.Feminino - d.Masculino)
+            : yDiff(0))
+        .attr("width", x.bandwidth())
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+        .attr("opacity", 0.5)
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
+            d3.select(this).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
+        });
+}
+
+
+function nivelGenderAbsBar() {
+
+    const subgroups = ["Masculino", "Feminino"];
+    const groups = dataset6.map(d => d.nivel);
+    console.log(groups);
+
+    clean();
+    // Escala x para os grupos (categorias de ensino)
+    var x = d3.scaleBand()
+      .domain(groups)
+      .range([0, width])
+      .padding([0.2])
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).tickSize(0));
+    
+    var y = d3.scaleLinear()
+      .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
+      .nice()
+      .range([height, 0]);
+
+    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
+
+      svg.append("g")
+      .call(d3.axisLeft(y));
+
+      var xSubgroup = d3.scaleBand()
+    .domain(subgroups)
+    .range([0, x.bandwidth()])
+    .padding([0.05])
+
+    // Cores
+    const color = d3.scaleOrdinal()
+      .domain(subgroups)
+      .range(["#1e90ff", "#ff69b4"]);
+
+    // Eixo X
+    svg.append("g")
+    .selectAll("g")
+    // Enter in data = loop group per group
+    .data(dataset6)
+    .enter()
+    .append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.nivel)+ ",0)" })
+    .selectAll("rect")
+    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+      .attr("x", function(d) { return xSubgroup(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", xSubgroup.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return color(d.key); });
+ 
+  // Show the bars
+  svg.append("g")
+    .selectAll("g")
+    // Enter in data = loop group per group
+    .data(dataset6)
+    .enter()
+    .append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.nivel) + ",0)"; })
+    .selectAll("rect")
+    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter().append("rect")
+      .attr("x", function(d) { return xSubgroup(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", xSubgroup.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return color(d.key); })
+      .on("mouseover", function(event, d) {
+        d3.select("#tooltip")
+            .style("display", "block")
+            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+        d3.select(this).attr("fill", "#339999");
+    })
+    .on("mousemove", function(event) {
+        d3.select("#tooltip")
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 20) + "px");
+    })
+    .on("mouseout", function(event, d) {
+        d3.select("#tooltip").style("display", "none");
+        d3.select(this).attr("fill", function(d) { return color(d.key); });
+    });
+}
+
+function nivelGenderProp() {
+    // Limpa o SVG
+    clean(); 
+
+    // Escalas para os dois gráficos
+    const x = d3.scaleBand()
+        .domain(dataset7.map(d => d.nivel))
+        .range([0, width])
+        .padding(0.2);
+
+    const xLine = d3.scalePoint()
+        .domain(dataset7.map(d => d.nivel))
+        .range([0, width])
+        .padding(0.5);
+
+    const yLine = d3.scaleLinear()
+        .domain([0, d3.max(dataset7, d => Math.max(d.Masculino, d.Feminino))])
+        .nice()
+        .range([height, 110]);
+
+    const yDiff = d3.scaleLinear()
+        .domain([
+            d3.min(dataset7, d => d.Feminino - d.Masculino),
+            d3.max(dataset7, d => d.Feminino - d.Masculino)
+        ])
+        .nice()
+        .range([height-400, 0]);
+
+    // Eixos
+    svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x));
+
+    svg.append("g")
+        .call(d3.axisLeft(yLine));
+
+    // Linhas
+    const lineMasculino = d3.line()
+        .x(d => xLine(d.nivel))
+        .y(d => yLine(d.Masculino));
+
+    const lineFeminino = d3.line()
+        .x(d => xLine(d.nivel))
+        .y(d => yLine(d.Feminino));
+
+    svg.append("path")
+        .datum(dataset7)
+        .attr("d", lineMasculino)
+        .attr("stroke", "#1e90ff")
+        .attr("fill", "none")
+        .attr("stroke-width", 2);
+
+    svg.append("path")
+        .datum(dataset7)
+        .attr("d", lineFeminino)
+        .attr("stroke", "#ff69b4")
+        .attr("fill", "none")
+        .attr("stroke-width", 2);
+
+    // Pontos nas linhas
+    svg.selectAll(".circle-male")
+        .data(dataset7)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLine(d.nivel))
+        .attr("cy", d => yLine(d.Masculino))
+        .attr("r", 4)
+        .attr("fill", "#1e90ff")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
+        });
+
+    svg.selectAll(".circle-female")
+        .data(dataset7)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLine(d.nivel))
+        .attr("cy", d => yLine(d.Feminino))
+        .attr("r", 4)
+        .attr("fill", "#ff69b4")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
+        });
+
+    // Barras de diferença (Feminino - Masculino)
+    svg.selectAll("rect")
+        .data(dataset7)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.nivel))
+        .attr("y", d => d.Feminino - d.Masculino >= 0
+            ? yDiff(d.Feminino - d.Masculino)
+            : yDiff(0))
+        .attr("width", x.bandwidth())
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+        .attr("opacity", 0.5)
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
+            d3.select(this).attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
+        });
+}
+
 window.drawPyr = drawPyr;
-window.drawLine = drawLine;
+window.salarioGenderProp = salarioGenderProp;
 window.activationFunctions = [
     drawPyr, // index 0
-    drawLine, // index 1
-    drawLine2, // index 2 — ou outra, se quiser criar um draw3()
-    drawLine3, // index 3
-    drawPyr  // index 4
+    salarioGenderProp, // index 1
+    ensinoGenderProp, // index 2 — ou outra, se quiser criar um draw3()
+    ensinoGenderAbsBar, // index 3
+    experienciaGenderProp,
+    experienciaGenderAbsBar,
+    nivelGenderAbsBar, // index 4
+    nivelGenderProp  // index 4
 ];
 
 
