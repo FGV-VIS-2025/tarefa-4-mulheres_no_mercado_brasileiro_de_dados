@@ -21,6 +21,8 @@ scroller.js e sections.js: lógica da rolagem e da visualização. -->
     <!-- Biblioteca para personalizar legenda -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
 </head>
 <body>
@@ -37,8 +39,11 @@ scroller.js e sections.js: lógica da rolagem e da visualização. -->
             <section class="step">
                     <h1 class="intro"><strong>Mulheres no Mercado de Dados brasileiro</strong><br></h1>              
                 <p>Apesar do avanço do mercado de dados no Brasil, a presença feminina ainda enfrenta barreiras. Esta análise explora a representatividade das mulheres no setor, destacando desigualdades salariais, níveis de formação e outros fatores que ajudam a entender os desafios e oportunidades rumo a um cenário mais inclusivo.</p>
-                <p><em>Continue rolando para entendermos melhor. </em> </p> 
+                <p><em>Continue rolando para entendermos melhor. Interaja com os gráficos e textos em <b>negrito</b> <i class="fas fa-mouse-pointer"></i></em> </p>
 
+
+
+                <!-- <img src="cursor.png" alt="Seta para baixo" width="35"> -->
                 <br>
                 <p class="scroll-indicator">
                     SCROLL <br>
@@ -50,6 +55,21 @@ scroller.js e sections.js: lógica da rolagem e da visualização. -->
                 </p>
                 
             </section>
+
+            <section class="step">
+                <h3>A quantidade</h3>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita earum facilis, aliquid accusamus optio laudantium aut quis deleniti similique ipsum quo consectetur autem aperiam, assumenda libero cupiditate enim! Odio, ab!Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium voluptatibus amet at. Aspernatur recusandae libero consectetur eaque tenetur dolorem eligendi, itaque possimus explicabo laudantium optio quo ratione reprehenderit necessitatibus ut!Lorem Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis nisi alias est cum, ipsum vitae voluptatem eaque voluptate corporis mollitia dolore labore velit quae exercitationem ipsam, ea hic porro quaerat? Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos quibusdam dignissimos eius accusantium cupiditate excepturi, unde odio, at veritatis illum voluptatibus, quod est tenetur. Enim blanditiis eum velit provident. Quam?</p>
+            </section>
+
+            <section class="step">
+                <h2>Proporções salariais <br>dentro de cada genêro</h2>
+                <p>O gráfico apresenta duas visualizações: a principal é um gráfico de linhas que mostra a distribuição proporcional dos salários para cada gênero, enquanto, acima, há um gráfico de barras destacando a diferença entre essas proporções (feminino - Masculino). Quando a barra é positiva, significa que a proporção de mulheres naquela faixa salarial é maior do que a de homens.
+<!-- 
+                    De modo geral, o comportamento da distribuição salarial é o esperado: tanto salários muito baixos quanto muito altos são menos comuns, concentrando-se a maioria das pessoas em faixas intermediárias de remuneração. -->
+                    
+                    Um ponto que merece atenção é a diferença observada na faixa  <b class="highlight-salary" data-min-salary="12000" data-max-salary="18000">R$ 12 mil a R$ 16 mil mensais</b> . Nesse intervalo, a diferença de gênero atinge seu pico, com 6,9% das mulheres e 10,7% dos homens concentrados nessa faixa, resultando em uma diferença de 3,8%. Curiosamente, essa faixa coincide com o conceito jurídico de "Trabalhadores Hipersuficientes" — profissionais que recebem acima de R$ 12.867,14. É justamente a partir desse patamar que a proporção de homens ultrapassa a de mulheres.</p>
+            </section>
+
 
 
             <section class="step">

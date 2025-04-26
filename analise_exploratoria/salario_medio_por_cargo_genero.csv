@@ -1,0 +1,41 @@
+cargo,genero,salario_medio
+Analista Administrativo,Feminino,4333.333333333333
+Analista Administrativo,Masculino,2458.3333333333335
+Analista de BI/BI Analyst/Analytics Engineer,Feminino,5738.805970149254
+Analista de BI/BI Analyst/Analytics Engineer,Masculino,6470.260223048327
+Analista de Dados/Data Analyst,Feminino,7286.585365853659
+Analista de Dados/Data Analyst,Masculino,6750.0
+Analista de Inteligência de Mercado/Market Intelligence,Feminino,9600.0
+Analista de Inteligência de Mercado/Market Intelligence,Masculino,5769.2307692307695
+Analista de Marketing,Feminino,4166.666666666667
+Analista de Marketing,Masculino,4750.0
+Analista de Negócios/Business Analyst,Feminino,5740.0
+Analista de Negócios/Business Analyst,Masculino,7535.211267605634
+Analista de Sistemas/Analista de TI,Feminino,5000.0
+Analista de Sistemas/Analista de TI,Masculino,4884.615384615385
+Arquiteto de Dados,Masculino,21428.571428571428
+Arquiteto de dados,Masculino,12000.0
+Cientista de Dados/Data Scientist,Feminino,7786.764705882353
+Cientista de Dados/Data Scientist,Masculino,9526.408450704226
+DBA/Administrador de Banco de Dados,Feminino,5000.0
+DBA/Administrador de Banco de Dados,Masculino,7458.333333333333
+Desenvolvedor ou Engenheiro de Software,Feminino,8576.923076923076
+Desenvolvedor ou Engenheiro de Software,Masculino,8506.578947368422
+Engenheiro de Dados/Data Engineer,Feminino,7650.0
+Engenheiro de Dados/Data Engineer,Masculino,10457.364341085271
+Engenheiro de Machine Learning/ML Engineer,Feminino,8500.0
+Engenheiro de Machine Learning/ML Engineer,Masculino,10868.421052631578
+Estatístico,Feminino,8055.555555555556
+Estatístico,Masculino,11400.0
+Outras Engenharias (não inclui dev),Feminino,6500.0
+Outras Engenharias (não inclui dev),Masculino,6793.103448275862
+Outro,Feminino,7045.454545454545
+Outro,Masculino,6937.5
+Product Manager,Feminino,15333.333333333334
+Product Manager,Masculino,10166.666666666666
+Professor,Feminino,6000.0
+Professor,Masculino,6937.5
+Suporte Técnico,Feminino,3166.6666666666665
+Suporte Técnico,Masculino,2875.0
+Técnico,Feminino,5000.0
+Técnico,Masculino,4272.727272727273

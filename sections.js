@@ -407,14 +407,6 @@ function salarioGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // // Eixos
-    // svg.append("g")
-    //     .attr("transform", `translate(0, ${height})`)
-    //     .call(d3.axisBottom(x));
-
-    // svg.append("g")
-    //     .call(d3.axisLeft(yLine));
-
     // Eixos (agora com transição de opacidade)
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -449,7 +441,6 @@ function salarioGenderProp() {
         .attr("font-size", "14px")
         .text("Proporção (%)")
         .style("opacity", 0.6);
-
 
     // Linhas
     const lineMasculino = d3.line()
@@ -574,7 +565,72 @@ function salarioGenderProp() {
             ? yDiff(d.Feminino - d.Masculino)
             : yDiff(0))
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Camada para destacar background
+    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+    // Seleciona o <b> do texto e adiciona interação
+    d3.selectAll(".highlight-salary")
+        .on("mouseover", function(event) {
+            const minFaixa = parseFloat(d3.select(this).attr("data-min-salary"));
+            const maxFaixa = parseFloat(d3.select(this).attr("data-max-salary"));
+
+            // Calcula intervalo real
+            const faixasNoIntervalo = dataset1.filter(d => {
+                const salario = parseFloat(d.faixa_salarial);
+                return salario >= minFaixa && salario <= maxFaixa;
+            });
+
+            if (faixasNoIntervalo.length === 0) return;
+
+            const primeiraFaixa = faixasNoIntervalo[0].faixa_salarial.trim();
+            const ultimaFaixa = faixasNoIntervalo[faixasNoIntervalo.length - 1].faixa_salarial.trim();
+
+            const xInicio = x(primeiraFaixa);
+            const xFim = x(ultimaFaixa) + x.bandwidth();
+
+            backgroundHighlight.selectAll("rect").remove();
+
+            backgroundHighlight.append("rect")
+                .attr("x", xInicio)
+                .attr("y", 0)
+                .attr("width", xFim - xInicio)
+                .attr("height", height)
+                .attr("fill", "#e0e0e0")
+                .attr("opacity", 0.4);
+
+            svg.selectAll("rect")
+                .filter(d => {
+                    const salario = parseFloat(d.faixa_salarial);
+                    return salario >= minFaixa && salario <= maxFaixa;
+                })
+                .attr("fill", "#c8c8c8");
+
+            svg.selectAll("circle")
+                .filter(d => {
+                    const salario = parseFloat(d.faixa_salarial);
+                    return salario >= minFaixa && salario <= maxFaixa;
+                })
+                .transition()
+                .duration(200)
+                .attr("r", 10);
+                // .attr("fill", "#1f039f");
+        })
+        .on("mouseout", function(event) {
+            backgroundHighlight.selectAll("rect").remove();
+
+            svg.selectAll("rect")
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+                .attr("opacity", 0.5);
+
+            svg.selectAll("circle")
+                .transition()
+                .duration(200)
+                .attr("r", 4);
+                // .attr("fill", d => "#1e90ff");
+        });
 }
+
 
 function ensinoGenderProp() {
     clean(); // Limpa o SVG
@@ -1713,6 +1769,7 @@ window.drawPyr = drawPyr;
 window.salarioGenderProp = salarioGenderProp;
 window.activationFunctions = [
     drawPyr, // index 0
+    drawPyr,
     salarioGenderProp, // index 1
     ensinoGenderProp, // index 2 — ou outra, se quiser criar um draw3()
     ensinoGenderAbsBar, // index 3
