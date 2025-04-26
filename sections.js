@@ -14,7 +14,7 @@ let svg;
 let dataset = [];
 
 // Tamanho e margens
-const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+const margin = { top: 50, right: 50, bottom: 50, left: 80 };
 const width = 950 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
 
@@ -116,7 +116,7 @@ function initVis() {
     svg = d3.select("#vis")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", height + margin.top + margin.bottom + 30)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -247,13 +247,30 @@ function drawPyr() {
         .attr("x", width / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
-        .text("Feminino");
+        .text("Mulheres");
 
     svg.append("text")
         .attr("x", (3 * width) / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
-        .text("Masculino");
+        .text("Homens");
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 65)
+        .attr("font-size", "15px")
+        .text("Quantidade de pessoas");
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -10)
+        .attr("font-size", "15px")
+        .text("Média Salarial");
     
     // define escala y contínua para a linha de salário médio
     const maxSalario = d3.max(dataset, d => d.faixa_salarial);
@@ -402,6 +419,26 @@ function salarioGenderProp() {
         .transition()
         .duration(1000)
         .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Faixa Salarial")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
+
 
     // Linhas
     const lineMasculino = d3.line()
@@ -570,6 +607,25 @@ function ensinoGenderProp() {
         .transition()
         .duration(800)
         .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Formação")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
 
     // Linhas
     const lineMasculino = d3.line()
@@ -745,6 +801,8 @@ function ensinoGenderAbsBar() {
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
 
+    
+
     clean(); // Limpa o SVG
 
     // Escala x para os grupos (categorias de ensino)
@@ -762,6 +820,8 @@ function ensinoGenderAbsBar() {
       .duration(800)
       .style("opacity", 1);
 
+      
+
     // Escala Y
     var y = d3.scaleLinear()
       .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
@@ -775,6 +835,27 @@ function ensinoGenderAbsBar() {
       .transition()
       .duration(800)
       .style("opacity", 1);
+
+    
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Formação")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
 
     // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
     var xSubgroup = d3.scaleBand()
@@ -865,6 +946,27 @@ function experienciaGenderAbsBar() {
       .transition()
       .duration(800)
       .style("opacity", 1);
+
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("Tempo de experiência (anos)")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
+    
 
     // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de experiência)
     var xSubgroup = d3.scaleBand()
@@ -961,6 +1063,25 @@ function experienciaGenderProp() {
         .transition()
         .duration(800)
         .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("Tempo de experiência (anos)")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
 
     // Linhas
     const lineMasculino = d3.line()
@@ -1193,7 +1314,8 @@ function nivelGenderAbsBar() {
     xAxis.transition()
         .duration(800)
         .style("opacity", 1)
-        .call(d3.axisBottom(x).tickSize(0));
+        .call(d3.axisBottom(x).tickSize(0))
+        .attr("font-size", "13.5px");
 
     // Eixo Y com animação de opacidade
     const yAxis = svg.append("g")
@@ -1224,6 +1346,25 @@ function nivelGenderAbsBar() {
             .duration(1000)
             .attr("y", d => y(d.value))
             .attr("height", d => height - y(d.value));
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
 
     // Interação nas barras
     svg.selectAll("g")
@@ -1282,7 +1423,8 @@ function nivelGenderProp() {
         .call(d3.axisBottom(x))
         .transition()
         .duration(800)
-        .style("opacity", 1);
+        .style("opacity", 1)
+        .attr("font-size", "14px");
 
     svg.append("g")
         .style("opacity", 0)
@@ -1290,6 +1432,25 @@ function nivelGenderProp() {
         .transition()
         .duration(800)
         .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -35)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
 
     // Linhas com animação de desenhar
     const lineMasculino = d3.line()
