@@ -556,30 +556,21 @@ function ensinoGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // // Eixos
-    // svg.append("g")
-    //     .attr("transform", `translate(0, ${height})`)
-    //     .call(d3.axisBottom(x));
-
-    // svg.append("g")
-    //     .call(d3.axisLeft(yLine));
-
-    // Eixos (agora com transição de opacidade)
+    // Eixos (com fade-in de opacity)
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
         .call(d3.axisBottom(x))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
 
     svg.append("g")
         .style("opacity", 0)
         .call(d3.axisLeft(yLine))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
-
 
     // Linhas
     const lineMasculino = d3.line()
@@ -600,6 +591,7 @@ function ensinoGenderProp() {
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
         .duration(1000)
+        .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
 
     svg.append("path")
@@ -612,49 +604,46 @@ function ensinoGenderProp() {
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
         .duration(1000)
+        .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas
+    // Pontos nas linhas - masculino
     svg.selectAll(".circle-male")
         .data(dataset2)
         .enter()
         .append("circle")
         .attr("cx", d => xLine(d.ensino.trim()))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 4)
+        .attr("r", 0) // começa com r = 0
         .attr("fill", "#1e90ff")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-                .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
-        })
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        .on("mouseout", function() {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        })
         .transition()
         .duration(800)
         .attr("r", 4);
 
+    // Pontos nas linhas - feminino
     svg.selectAll(".circle-female")
         .data(dataset2)
         .enter()
         .append("circle")
         .attr("cx", d => xLine(d.ensino.trim()))
         .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 4)
+        .attr("r", 0) // começa com r = 0
         .attr("fill", "#ff69b4")
+        .transition()
+        .duration(800)
+        .attr("r", 4);
+
+    // Interatividade dos pontos masculinos
+    svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -663,28 +652,65 @@ function ensinoGenderProp() {
         })
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
-        })
-        .transition()
-        .duration(800)
-        .attr("r", 4);
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#1e90ff");
+        });
 
-    // Barras de diferença (Feminino - Masculino)
+    // Interatividade dos pontos femininos
+    svg.selectAll(".circle-female")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#ff69b4");
+        });
+
+    // Barras de diferença (crescendo da altura zero)
     svg.selectAll("rect")
         .data(dataset2)
         .enter()
         .append("rect")
         .attr("x", d => x(d.ensino.trim()))
-        .attr("y", yDiff(0)) // começa no meio
+        .attr("y", yDiff(0)) // inicia no meio
         .attr("width", x.bandwidth())
-        .attr("height", 0) // começa altura 0
+        .attr("height", 0) // altura inicial 0
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
+        .transition()
+        .duration(1000)
+        .attr("y", d => d.Feminino - d.Masculino >= 0
+            ? yDiff(d.Feminino - d.Masculino)
+            : yDiff(0))
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Interatividade nas barras depois da transição
+    svg.selectAll("rect")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
                 .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
-            d3.select(this).attr("fill", "#339999");
+            d3.select(this)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -693,14 +719,9 @@ function ensinoGenderProp() {
         })
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
-        })
-        .transition()
-        .duration(1000)
-        .attr("y", d => d.Feminino - d.Masculino >= 0
-            ? yDiff(d.Feminino - d.Masculino)
-            : yDiff(0))
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+            d3.select(this)
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
+        });
 }
 
 function ensinoGenderAbsBar() {
