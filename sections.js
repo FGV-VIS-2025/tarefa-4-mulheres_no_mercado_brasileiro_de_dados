@@ -40,6 +40,20 @@ d3.csv("motivos_satisfacao.csv").then(data => {
     }));
 });
 
+d3.csv("motivo_homem.csv").then(data => {
+    dataset9 = data.map(d => ({
+        motivo: d.motivo,
+        quantidade: +d.quantidade
+    }));
+});
+
+d3.csv("motivo_mulher.csv").then(data => {
+    dataset10 = data.map(d => ({
+        motivo: d.motivo,
+        quantidade: +d.quantidade
+    }));
+});
+
 d3.csv("grouped_salario_prop.csv").then(data => {
     dataset2 = data.map(d => ({
         ensino: d.Ensino.trim(),
@@ -1696,20 +1710,19 @@ function wordCloud() {
         Prop_mulher: +d.Prop_mulher
         }));
     
-    svg.append("svg")
+    svg//.append("svg")
     .attr("width", width)
     .attr("height", height)
     .style("font-family", "sans-serif")
     .style("text-anchor", "middle")
-    .attr("id", "wordcloud-svg"); 
 
     const g = svg.append("g")
-                .attr("transform", `translate(${width/6}, ${height/2})`);
+                .attr("transform", `translate(${width/2},${height/2})`);
 
     const layout = d3.layout.cloud()
         .size([width, height])
         .words(words)
-        .padding(2)
+        .padding(5)
         .rotate(() => 0)
         .font("sans-serif")
         .fontSize(d => d.size)
@@ -1737,8 +1750,7 @@ function wordCloud() {
         {
             g.selectAll("text")
             .data(words)
-            .enter()
-            .append("text")
+            .join("text")
             .attr("font-size", d => d.size)
             .attr("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"))
             .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
@@ -1763,7 +1775,393 @@ function wordCloud() {
         });
     }
 
+    const legend = svg.append("g")
+        .attr("class", "legend-buttons")
+        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+
+    // Botão para Homens
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -70)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#1e90ff")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudMan();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -50)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Homens");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -30)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#ff69b4")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudWoman();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Mulheres");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", 10)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#339999")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloud();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Geral");
+
 }
+
+function wordCloudWoman() {
+    clean();
+
+    const sizeScale = d3.scaleLinear()
+        .domain(d3.extent(dataset10, d => d.quantidade))
+        .range([10, 45]);
+
+    const words = dataset10.map(d => ({
+        text: d.motivo,
+        size: sizeScale(d.quantidade),
+        quantidade: +d.quantidade,
+        }));
+    
+    svg//.append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("font-family", "sans-serif")
+    .style("text-anchor", "middle")
+
+    const g = svg.append("g")
+                .attr("transform", `translate(${width/2},${height/2})`);
+
+    const layout = d3.layout.cloud()
+        .size([width, height])
+        .words(words)
+        .padding(5)
+        .rotate(() => 0)
+        .font("sans-serif")
+        .fontSize(d => d.size)
+        .on("end", draw);
+
+    layout.start();
+
+    // Tooltip (garante que só tenha um)
+    let tooltip = d3.select("#tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip")
+        .style("position", "absolute")
+        .style("background", "rgba(0,0,0,0.8)")
+        .style("color", "white")
+        .style("padding", "6px 10px")
+        .style("border-radius", "4px")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .style("display", "none");
+    }
+
+    function draw(words) 
+        {
+            g.selectAll("text")
+            .data(words)
+            .join("text")
+            .attr("font-size", d => d.size)
+            .attr("fill", d =>  "#ff69b4")
+            .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+            .text(d => d.text)
+        .on("mouseover", function (event, d) {
+        tooltip.style("display", "block")
+            .html(`
+            Citado ${d.quantidade} vezes por mulheres 👩
+            `);
+        
+        d3.select(this).style("fill", "#339999");
+        })
+        .on("mousemove", function (event) {
+        tooltip
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function (event, d) {
+        tooltip.style("display", "none");
+        d3.select(this).style("fill", "#ff69b4");
+        });
+    }
+
+    const legend = svg.append("g")
+        .attr("class", "legend-buttons")
+        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+
+    // Botão para Homens
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -70)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#1e90ff")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudMan();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -50)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Homens");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -30)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#ff69b4")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudWoman();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Mulheres");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", 10)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#339999")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloud();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Geral");
+}
+
+function wordCloudMan() {
+    clean();
+
+    const sizeScale = d3.scaleLinear()
+        .domain(d3.extent(dataset9, d => d.quantidade))
+        .range([10, 45]);
+
+    const words = dataset9.map(d => ({
+        text: d.motivo,
+        size: sizeScale(d.quantidade),
+        quantidade: +d.quantidade,
+        }));
+    
+    svg//.append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("font-family", "sans-serif")
+    .style("text-anchor", "middle")
+
+    const g = svg.append("g")
+                .attr("transform", `translate(${width/2},${height/2})`);
+
+    const layout = d3.layout.cloud()
+        .size([width, height])
+        .words(words)
+        .padding(5)
+        .rotate(() => 0)
+        .font("sans-serif")
+        .fontSize(d => d.size)
+        .on("end", draw);
+
+    layout.start();
+
+    // Tooltip (garante que só tenha um)
+    let tooltip = d3.select("#tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip")
+        .style("position", "absolute")
+        .style("background", "rgba(0,0,0,0.8)")
+        .style("color", "white")
+        .style("padding", "6px 10px")
+        .style("border-radius", "4px")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .style("display", "none");
+    }
+
+    function draw(words) 
+        {
+            g.selectAll("text")
+            .data(words)
+            .join("text")
+            .attr("font-size", d => d.size)
+            .attr("fill", d =>  "#1e90ff")
+            .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+            .text(d => d.text)
+        .on("mouseover", function (event, d) {
+        tooltip.style("display", "block")
+            .html(`
+            Citado ${d.quantidade} vezes por homens 👨
+            `);
+        
+        d3.select(this).style("fill", "#339999");
+        })
+        .on("mousemove", function (event) {
+        tooltip
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function (event, d) {
+        tooltip.style("display", "none");
+        d3.select(this).style("fill", "#1e90ff");
+        });
+    }
+
+    const legend = svg.append("g")
+        .attr("class", "legend-buttons")
+        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+
+    // Botão para Homens
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -70)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#1e90ff")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudMan();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -50)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Homens");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", -30)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#ff69b4")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloudWoman();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Mulheres");
+
+    // Botão para Mulheres
+    legend.append("rect")
+        .attr("x", 0)
+        .attr("y", 10)
+        .attr("width", 130)
+        .attr("height", 30)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "#339999")
+        .style("cursor", "pointer")
+        .on("click", function() {
+            clean();
+            wordCloud();
+        });
+
+    legend.append("text")
+        .attr("x", 65)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("fill", "white")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .text("Geral");
+}
+
+
 
 window.drawPyr = drawPyr;
 window.salarioGenderProp = salarioGenderProp;
