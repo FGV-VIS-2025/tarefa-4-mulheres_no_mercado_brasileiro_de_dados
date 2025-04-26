@@ -1102,90 +1102,98 @@ function experienciaGenderProp() {
 }
 
 
+
 function nivelGenderAbsBar() {
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset6.map(d => d.nivel);
     console.log(groups);
 
-    clean();
+    clean(); // Limpa o SVG
+
     // Escala x para os grupos (categorias de ensino)
     var x = d3.scaleBand()
-      .domain(groups)
-      .range([0, width])
-      .padding([0.2])
-  svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).tickSize(0));
-    
+        .domain(groups)
+        .range([0, width])
+        .padding([0.2]);
+
+    // Escala y para os valores
     var y = d3.scaleLinear()
-      .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
-      .nice()
-      .range([height, 0]);
+        .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
+        .nice()
+        .range([height, 0]);
 
-    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
-
-      svg.append("g")
-      .call(d3.axisLeft(y));
-
-      var xSubgroup = d3.scaleBand()
-    .domain(subgroups)
-    .range([0, x.bandwidth()])
-    .padding([0.05])
+    // Escala interna para subgrupos (Masculino/Feminino dentro de cada grupo)
+    var xSubgroup = d3.scaleBand()
+        .domain(subgroups)
+        .range([0, x.bandwidth()])
+        .padding([0.05]);
 
     // Cores
     const color = d3.scaleOrdinal()
-      .domain(subgroups)
-      .range(["#1e90ff", "#ff69b4"]);
+        .domain(subgroups)
+        .range(["#1e90ff", "#ff69b4"]);
 
-    // Eixo X
+    // Eixo X com animação de opacidade
+    const xAxis = svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .style("opacity", 0);
+
+    xAxis.transition()
+        .duration(800)
+        .style("opacity", 1)
+        .call(d3.axisBottom(x).tickSize(0));
+
+    // Eixo Y com animação de opacidade
+    const yAxis = svg.append("g")
+        .style("opacity", 0);
+
+    yAxis.transition()
+        .duration(800)
+        .style("opacity", 1)
+        .call(d3.axisLeft(y));
+
+    // Criação das barras
     svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset6)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.nivel)+ ",0)" })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); });
- 
-  // Show the bars
-  svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset6)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.nivel) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); })
-      .on("mouseover", function(event, d) {
-        d3.select("#tooltip")
-            .style("display", "block")
-            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-        d3.select(this).attr("fill", "#339999");
-    })
-    .on("mousemove", function(event) {
-        d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mouseout", function(event, d) {
-        d3.select("#tooltip").style("display", "none");
-        d3.select(this).attr("fill", function(d) { return color(d.key); });
-    });
+        .selectAll("g")
+        .data(dataset6)
+        .enter()
+        .append("g")
+            .attr("transform", d => `translate(${x(d.nivel)},0)`)
+        .selectAll("rect")
+        .data(d => subgroups.map(key => ({ key: key, value: d[key] })))
+        .enter()
+        .append("rect")
+            .attr("x", d => xSubgroup(d.key))
+            .attr("y", y(0)) // começa do chão
+            .attr("width", xSubgroup.bandwidth())
+            .attr("height", 0) // altura inicial 0
+            .attr("fill", d => color(d.key))
+            .transition()
+            .duration(1000)
+            .attr("y", d => y(d.value))
+            .attr("height", d => height - y(d.value));
+
+    // Interação nas barras
+    svg.selectAll("g")
+        .selectAll("rect")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+            d3.select(this)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .attr("fill", d => color(d.key));
+        });
 }
 
 function nivelGenderProp() {
