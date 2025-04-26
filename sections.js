@@ -664,8 +664,8 @@ function ensinoGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Linha feminino
@@ -694,8 +694,8 @@ function ensinoGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Pontos masculinos
@@ -710,6 +710,7 @@ function ensinoGenderProp() {
         .attr("fill", "#1e90ff")
         .transition()
         .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("r", 4);
 
     // Pontos femininos
@@ -1120,8 +1121,8 @@ function experienciaGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Linha Feminino
@@ -1150,8 +1151,8 @@ function experienciaGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Pontos nas linhas - masculino
@@ -1166,6 +1167,7 @@ function experienciaGenderProp() {
         .attr("fill", "#1e90ff")
         .transition()
         .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("r", 4);
 
     // Pontos nas linhas - feminino
@@ -1180,6 +1182,7 @@ function experienciaGenderProp() {
         .attr("fill", "#ff69b4")
         .transition()
         .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("r", 4);
 
     // Tooltip dos pontos - masculino
@@ -1345,7 +1348,8 @@ function nivelGenderAbsBar() {
             .attr("height", 0) // altura inicial 0
             .attr("fill", d => color(d.key))
             .transition()
-            .duration(1000)
+            .duration(800)
+            .ease(d3.easeQuadIn)
             .attr("y", d => y(d.value))
             .attr("height", d => height - y(d.value));
 
@@ -1355,7 +1359,7 @@ function nivelGenderAbsBar() {
         .attr("x", width / 2)
         .attr("y", height + 40)
         .attr("font-size", "14px")
-        .text("")
+        .text("Nível de Senioridade")
         .style("opacity", 0.6);
 
     // Título do eixo Y
@@ -1439,9 +1443,9 @@ function nivelGenderProp() {
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
-        .attr("y", height + 40)
+        .attr("y", height + 45)
         .attr("font-size", "14px")
-        .text("")
+        .text("Nível de Senioridade")
         .style("opacity", 0.6);
 
     // Título do eixo Y
@@ -1472,8 +1476,8 @@ function nivelGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     svg.append("path")
@@ -1485,8 +1489,8 @@ function nivelGenderProp() {
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Pontos nas linhas - masculino
@@ -1501,6 +1505,7 @@ function nivelGenderProp() {
         .attr("fill", "#1e90ff")
         .transition()
         .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("r", 4);
 
     // Pontos nas linhas - feminino
@@ -1515,6 +1520,7 @@ function nivelGenderProp() {
         .attr("fill", "#ff69b4")
         .transition()
         .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("r", 4);
 
     // Interações dos pontos - masculino
@@ -1582,7 +1588,8 @@ function nivelGenderProp() {
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
         .transition()
-        .duration(1000)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("y", d => d.Feminino - d.Masculino >= 0
             ? yDiff(d.Feminino - d.Masculino)
             : yDiff(0))

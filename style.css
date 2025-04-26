@@ -90,18 +90,36 @@ body {
     justify-content: center; /* opcional, se quiser centralizar horizontalmente */
 }
 
-.scroll-indicator {
+/* .scroll-indicator {
     margin-top: 40px;
     font-weight: bold;
     text-align: center;
+    animation: bounce 1.2s infinite;
   }
   
   .scroll-indicator .arrow {
     font-size: 2em;
     display: block;
     animation: bounce 1.2s infinite;
-  }
+  } */
   
+.scroll-indicator {
+    margin-top: 40px;
+    font-weight: bold;
+    text-align: center;
+    animation: bounce 1.2s infinite;
+}
+
+.scroll-indicator .arrow {
+    margin: 0;
+    padding: 0;
+    font-size: 1.2em; /* menor se quiser */
+    display: inline-block;
+    vertical-align: middle;
+    animation: bounce 1.2s infinite;
+}
+
+
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(8px); }
