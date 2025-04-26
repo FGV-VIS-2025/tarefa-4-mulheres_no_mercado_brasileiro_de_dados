@@ -177,9 +177,9 @@ function drawPyr() {
         .enter()
         .append("rect")
         .attr("class", "bar-f")
-        .attr("x", d => x(d.Feminino))
+        .attr("x", x(0)) // começa do centro
         .attr("y", d => y(d.faixa_salarial))
-        .attr("width", d => x(0) - x(d.Feminino))
+        .attr("width", 0) // começa sem largura
         .attr("height", y.bandwidth())
         .attr("fill", "#ff69b4")
         .on("mouseover", function(event, d) {
@@ -187,55 +187,60 @@ function drawPyr() {
                 .style("display", "block")
                 .html(`
                     <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
-                    <strong>Quantidade:</strong> ${ - d.Feminino   }
+                    <strong>Quantidade:</strong> ${-d.Feminino}
                 `);
             d3.select(this)
                 .attr("fill", "#339999");
         })
-        // - MOve tooltip com o mouse
         .on("mousemove", function(event) {
             d3.select("#tooltip")
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
-        // - Retira tooltip quando o mouse sai
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", "#ff69b4");
-        });
+        })
+        .transition()
+        .duration(1000)
+        .attr("x", d => x(d.Feminino))
+        .attr("width", d => x(0) - x(d.Feminino));
 
-        // barra masculina a direita
+
+        /// barra masculina a direita
         svg.selectAll(".bar-m")
-        .data(dataset)
-        .enter()
-        .append("rect")
-        .attr("class", "bar-m")
-        .attr("x", x(0))
-        .attr("y", d => y(d.faixa_salarial))
-        .attr("width", d => x(d.Masculino) - x(0))
-        .attr("height", y.bandwidth())
-        .attr("fill", "#1e90ff")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-            .style("display", "block")
-                .html(`
-                    <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
-                    <strong>Quantidade:</strong> ${d.Masculino}
-                `);
-            d3.select(this)
-            .attr("fill", "#339999");
-        })
-        // - MOve tooltip com o mouse
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        // - Retira tooltip quando o mouse sai
-        .on("mouseout", function() {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", "#1e90ff");
-        });
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("class", "bar-m")
+            .attr("x", x(0)) // começa do centro
+            .attr("y", d => y(d.faixa_salarial))
+            .attr("width", 0) // começa sem largura
+            .attr("height", y.bandwidth())
+            .attr("fill", "#1e90ff")
+            .on("mouseover", function(event, d) {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .html(`
+                        <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
+                        <strong>Quantidade:</strong> ${d.Masculino}
+                    `);
+                d3.select(this)
+                    .attr("fill", "#339999");
+            })
+            .on("mousemove", function(event) {
+                d3.select("#tooltip")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+            })
+            .on("mouseout", function() {
+                d3.select("#tooltip").style("display", "none");
+                d3.select(this).attr("fill", "#1e90ff");
+            })
+            .transition()
+            .duration(1000)
+            .attr("width", d => x(d.Masculino) - x(0));
+
     
     // adiciona os textos 
     svg.append("text")
@@ -271,7 +276,9 @@ function drawPyr() {
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     // pontilhado
-    .attr("stroke-dasharray", "4,4");
+    .attr("stroke-dasharray", "4,4")
+    .attr("stroke-width", 2)
+    .attr("stroke-opacity", 0.5);
 
     // linha invisível, só para p tooltip
     svg.append("line")
@@ -310,7 +317,9 @@ function drawPyr() {
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     // pontilhado
-    .attr("stroke-dasharray", "4,4");
+    .attr("stroke-dasharray", "4,4")
+    .attr("stroke-width", 2)
+    .attr("stroke-opacity", 0.5);
 
     // linha invisível, só parao tooltip
     svg.append("line")
