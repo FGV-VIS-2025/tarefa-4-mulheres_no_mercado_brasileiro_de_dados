@@ -14,7 +14,7 @@ let svg;
 let dataset = [];
 
 // Tamanho e margens
-const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+const margin = { top: 50, right: 50, bottom: 50, left: 80 };
 const width = 950 - margin.left - margin.right;
 const height = 600 - margin.top - margin.bottom;
 
@@ -125,7 +125,7 @@ function initVis() {
     svg = d3.select("#vis")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", height + margin.top + margin.bottom + 30)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
@@ -186,9 +186,9 @@ function drawPyr() {
         .enter()
         .append("rect")
         .attr("class", "bar-f")
-        .attr("x", d => x(d.Feminino))
+        .attr("x", x(0)) // começa do centro
         .attr("y", d => y(d.faixa_salarial))
-        .attr("width", d => x(0) - x(d.Feminino))
+        .attr("width", 0) // começa sem largura
         .attr("height", y.bandwidth())
         .attr("fill", "#ff69b4")
         .on("mouseover", function(event, d) {
@@ -196,68 +196,92 @@ function drawPyr() {
                 .style("display", "block")
                 .html(`
                     <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
-                    <strong>Quantidade:</strong> ${ - d.Feminino   }
+                    <strong>Quantidade:</strong> ${-d.Feminino}
                 `);
             d3.select(this)
                 .attr("fill", "#339999");
         })
-        // - MOve tooltip com o mouse
         .on("mousemove", function(event) {
             d3.select("#tooltip")
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
-        // - Retira tooltip quando o mouse sai
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", "#ff69b4");
-        });
+        })
+        .transition()
+        .duration(1000)
+        .attr("x", d => x(d.Feminino))
+        .attr("width", d => x(0) - x(d.Feminino));
 
-        // barra masculina a direita
+
+        /// barra masculina a direita
         svg.selectAll(".bar-m")
-        .data(dataset)
-        .enter()
-        .append("rect")
-        .attr("class", "bar-m")
-        .attr("x", x(0))
-        .attr("y", d => y(d.faixa_salarial))
-        .attr("width", d => x(d.Masculino) - x(0))
-        .attr("height", y.bandwidth())
-        .attr("fill", "#1e90ff")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-            .style("display", "block")
-                .html(`
-                    <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
-                    <strong>Quantidade:</strong> ${d.Masculino}
-                `);
-            d3.select(this)
-            .attr("fill", "#339999");
-        })
-        // - MOve tooltip com o mouse
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        // - Retira tooltip quando o mouse sai
-        .on("mouseout", function() {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", "#1e90ff");
-        });
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("class", "bar-m")
+            .attr("x", x(0)) // começa do centro
+            .attr("y", d => y(d.faixa_salarial))
+            .attr("width", 0) // começa sem largura
+            .attr("height", y.bandwidth())
+            .attr("fill", "#1e90ff")
+            .on("mouseover", function(event, d) {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .html(`
+                        <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
+                        <strong>Quantidade:</strong> ${d.Masculino}
+                    `);
+                d3.select(this)
+                    .attr("fill", "#339999");
+            })
+            .on("mousemove", function(event) {
+                d3.select("#tooltip")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+            })
+            .on("mouseout", function() {
+                d3.select("#tooltip").style("display", "none");
+                d3.select(this).attr("fill", "#1e90ff");
+            })
+            .transition()
+            .duration(1000)
+            .attr("width", d => x(d.Masculino) - x(0));
+
     
     // adiciona os textos 
     svg.append("text")
         .attr("x", width / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
-        .text("Feminino");
+        .attr("fill", "#ff0080")
+        .text("Mulheres");
 
     svg.append("text")
         .attr("x", (3 * width) / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
-        .text("Masculino");
+        .attr("fill", "#007af2")
+        .text("Homens");
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 65)
+        .attr("font-size", "15px")
+        .text("Quantidade de pessoas");
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -10)
+        .attr("font-size", "15px")
+        .text("Média Salarial");
     
     // define escala y contínua para a linha de salário médio
     const maxSalario = d3.max(dataset, d => d.faixa_salarial);
@@ -280,7 +304,9 @@ function drawPyr() {
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     // pontilhado
-    .attr("stroke-dasharray", "4,4");
+    .attr("stroke-dasharray", "4,4")
+    .attr("stroke-width", 2)
+    .attr("stroke-opacity", 0.5);
 
     // linha invisível, só para p tooltip
     svg.append("line")
@@ -319,7 +345,9 @@ function drawPyr() {
     .attr("stroke", "black")
     .attr("stroke-width", 3)
     // pontilhado
-    .attr("stroke-dasharray", "4,4");
+    .attr("stroke-dasharray", "4,4")
+    .attr("stroke-width", 2)
+    .attr("stroke-opacity", 0.5);
 
     // linha invisível, só parao tooltip
     svg.append("line")
@@ -402,6 +430,26 @@ function salarioGenderProp() {
         .transition()
         .duration(1000)
         .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Faixa Salarial")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
+
 
     // Linhas
     const lineMasculino = d3.line()
@@ -528,11 +576,10 @@ function salarioGenderProp() {
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
 }
 
-
 function ensinoGenderProp() {
     clean(); // Limpa o SVG
 
-    // Escalas para os dois gráficos
+    // Escalas
     const x = d3.scaleBand()
         .domain(dataset2.map(d => d.ensino.trim()))
         .range([0, width])
@@ -556,30 +603,40 @@ function ensinoGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // // Eixos
-    // svg.append("g")
-    //     .attr("transform", `translate(0, ${height})`)
-    //     .call(d3.axisBottom(x));
-
-    // svg.append("g")
-    //     .call(d3.axisLeft(yLine));
-
-    // Eixos (agora com transição de opacidade)
+    // Eixos
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
         .call(d3.axisBottom(x))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
 
     svg.append("g")
         .style("opacity", 0)
         .call(d3.axisLeft(yLine))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
 
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Formação")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
 
     // Linhas
     const lineMasculino = d3.line()
@@ -590,44 +647,101 @@ function ensinoGenderProp() {
         .x(d => xLine(d.ensino.trim()))
         .y(d => yLine(d.Feminino));
 
+    // Linha masculino
     svg.append("path")
         .datum(dataset2)
         .attr("d", lineMasculino)
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
         .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke") // << ADICIONADO
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Homens:</strong> Passe o mouse sobre os pontos para ver o valor.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
         .duration(1000)
+        .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
 
+    // Linha feminino
     svg.append("path")
         .datum(dataset2)
         .attr("d", lineFeminino)
         .attr("stroke", "#ff69b4")
         .attr("fill", "none")
         .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke") // << ADICIONADO
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Mulheres:</strong> Passe o mouse sobre os pontos para ver o valor.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
         .duration(1000)
+        .ease(d3.easeLinear)
         .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas
+    // Pontos masculinos
     svg.selectAll(".circle-male")
         .data(dataset2)
         .enter()
         .append("circle")
+        .attr("class", "circle-male")
         .attr("cx", d => xLine(d.ensino.trim()))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 4)
+        .attr("r", 0)
         .attr("fill", "#1e90ff")
+        .transition()
+        .duration(800)
+        .attr("r", 4);
+
+    // Pontos femininos
+    svg.selectAll(".circle-female")
+        .data(dataset2)
+        .enter()
+        .append("circle")
+        .attr("class", "circle-female")
+        .attr("cx", d => xLine(d.ensino.trim()))
+        .attr("cy", d => yLine(d.Feminino))
+        .attr("r", 0)
+        .attr("fill", "#ff69b4")
+        .transition()
+        .duration(800)
+        .attr("r", 4);
+
+    // Interação nos pontos - masculino
+    svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção (Homens):</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this).transition().duration(100).attr("r", 8).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -637,24 +751,15 @@ function ensinoGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        })
-        .transition()
-        .duration(800)
-        .attr("r", 4);
+        });
 
+    // Interação nos pontos - feminino
     svg.selectAll(".circle-female")
-        .data(dataset2)
-        .enter()
-        .append("circle")
-        .attr("cx", d => xLine(d.ensino.trim()))
-        .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 4)
-        .attr("fill", "#ff69b4")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção (Mulheres):</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this).transition().duration(100).attr("r", 8).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -664,26 +769,31 @@ function ensinoGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
-        })
-        .transition()
-        .duration(800)
-        .attr("r", 4);
+        });
 
-    // Barras de diferença (Feminino - Masculino)
-    svg.selectAll("rect")
+    // Barras de diferença
+    svg.selectAll(".diff-bar")
         .data(dataset2)
         .enter()
         .append("rect")
+        .attr("class", "diff-bar")
         .attr("x", d => x(d.ensino.trim()))
-        .attr("y", yDiff(0)) // começa no meio
+        .attr("y", yDiff(0))
         .attr("width", x.bandwidth())
-        .attr("height", 0) // começa altura 0
+        .attr("height", 0)
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
+        .transition()
+        .duration(1000)
+        .attr("y", d => d.Feminino - d.Masculino >= 0 ? yDiff(d.Feminino - d.Masculino) : yDiff(0))
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Interação nas barras
+    svg.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
+                .html(`<strong>Diferença:</strong> ${Math.round((d.Feminino - d.Masculino) * 10) / 10}%`);
             d3.select(this).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
@@ -694,13 +804,7 @@ function ensinoGenderProp() {
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
-        })
-        .transition()
-        .duration(1000)
-        .attr("y", d => d.Feminino - d.Masculino >= 0
-            ? yDiff(d.Feminino - d.Masculino)
-            : yDiff(0))
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+        });
 }
 
 function ensinoGenderAbsBar() {
@@ -708,40 +812,77 @@ function ensinoGenderAbsBar() {
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
 
-    clean();
+    
+
+    clean(); // Limpa o SVG
+
     // Escala x para os grupos (categorias de ensino)
     var x = d3.scaleBand()
       .domain(groups)
       .range([0, width])
-      .padding([0.2])
-  svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).tickSize(0));
-    
+      .padding([0.2]);
+
+    // Criação do eixo X com animação
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .style("opacity", 0)
+      .call(d3.axisBottom(x).tickSize(0))
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
+
+      
+
+    // Escala Y
     var y = d3.scaleLinear()
       .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
       .nice()
       .range([height, 0]);
 
-    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
+    // Criação do eixo Y com animação
+    svg.append("g")
+      .style("opacity", 0)
+      .call(d3.axisLeft(y))
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
 
-      svg.append("g")
-      .call(d3.axisLeft(y));
+    
 
-      var xSubgroup = d3.scaleBand()
-    .domain(subgroups)
-    .range([0, x.bandwidth()])
-    .padding([0.05])
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("font-size", "14px")
+        .text("Formação")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
+
+    // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
+    var xSubgroup = d3.scaleBand()
+      .domain(subgroups)
+      .range([0, x.bandwidth()])
+      .padding([0.05]);
 
     // Cores
     const color = d3.scaleOrdinal()
       .domain(subgroups)
       .range(["#1e90ff", "#ff69b4"]);
 
-    // Eixo X
+    // Barras
     svg.append("g")
     .selectAll("g")
-    // Enter in data = loop group per group
+    // Enter na data = loop grupo por grupo
     .data(dataset3)
     .enter()
     .append("g")
@@ -750,43 +891,35 @@ function ensinoGenderAbsBar() {
     .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
     .enter().append("rect")
       .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
+      .attr("y", y(0)) // começa do eixo x (para animar)
       .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); });
- 
-  // Show the bars
-  svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset3)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.ensino) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
+      .attr("height", 0) // começa com altura 0
       .attr("fill", function(d) { return color(d.key); })
+      .transition()
+      .duration(1000)
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+
+    // Interação nas barras
+    svg.selectAll("g")
+      .selectAll("rect")
       .on("mouseover", function(event, d) {
         d3.select("#tooltip")
             .style("display", "block")
             .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
         d3.select(this).attr("fill", "#339999");
-    })
-    .on("mousemove", function(event) {
+      })
+      .on("mousemove", function(event) {
         d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mouseout", function(event, d) {
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function(event, d) {
         d3.select("#tooltip").style("display", "none");
         d3.select(this).attr("fill", function(d) { return color(d.key); });
-    });
+      });
 }
+
 
 function experienciaGenderAbsBar() {
 
@@ -794,91 +927,115 @@ function experienciaGenderAbsBar() {
     const groups = dataset4.map(d => d.experiencia);
     // console.log(groups);
 
-    clean();
-    // Escala x para os grupos (categorias de ensino)
+    clean(); // Limpa o SVG
+
+    // Escala x para os grupos (categorias de experiência)
     var x = d3.scaleBand()
       .domain(groups)
       .range([0, width])
-      .padding([0.2])
-  svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).tickSize(0));
-    
+      .padding([0.2]);
+
+    // Criação do eixo X com animação
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .style("opacity", 0)
+      .call(d3.axisBottom(x).tickSize(0))
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
+
+    // Escala Y
     var y = d3.scaleLinear()
       .domain([0, d3.max(dataset4, d => Math.max(d.Masculino, d.Feminino))])
       .nice()
       .range([height, 0]);
 
-    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
+    // Criação do eixo Y com animação
+    svg.append("g")
+      .style("opacity", 0)
+      .call(d3.axisLeft(y))
+      .transition()
+      .duration(800)
+      .style("opacity", 1);
 
-      svg.append("g")
-      .call(d3.axisLeft(y));
 
-      var xSubgroup = d3.scaleBand()
-    .domain(subgroups)
-    .range([0, x.bandwidth()])
-    .padding([0.05])
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("Tempo de experiência (anos)")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
+    
+
+    // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de experiência)
+    var xSubgroup = d3.scaleBand()
+      .domain(subgroups)
+      .range([0, x.bandwidth()])
+      .padding([0.05]);
 
     // Cores
     const color = d3.scaleOrdinal()
       .domain(subgroups)
       .range(["#1e90ff", "#ff69b4"]);
 
-    // Eixo X
-    svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset4)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); });
- 
-  // Show the bars
-  svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset4)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); })
-      .on("mouseover", function(event, d) {
-        d3.select("#tooltip")
-            .style("display", "block")
-            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-        d3.select(this).attr("fill", "#339999");
-    })
-    .on("mousemove", function(event) {
-        d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mouseout", function(event, d) {
-        d3.select("#tooltip").style("display", "none");
-        d3.select(this).attr("fill", function(d) { return color(d.key); });
-    });
-}
+    // Criação das barras
+    const barGroups = svg.append("g")
+      .selectAll("g")
+      // Enter na data = loop grupo por grupo
+      .data(dataset4)
+      .enter()
+      .append("g")
+        .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; });
 
+    barGroups.selectAll("rect")
+      .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return xSubgroup(d.key); })
+        .attr("y", y(0)) // começa no chão para animar
+        .attr("width", xSubgroup.bandwidth())
+        .attr("height", 0) // altura inicial 0
+        .attr("fill", function(d) { return color(d.key); })
+      .transition()
+      .duration(1000)
+        .attr("y", function(d) { return y(d.value); })
+        .attr("height", function(d) { return height - y(d.value); });
+
+    // Interação nas barras
+    barGroups.selectAll("rect")
+      .on("mouseover", function(event, d) {
+          d3.select("#tooltip")
+              .style("display", "block")
+              .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+          d3.select(this)
+              .attr("fill", "#339999");
+      })
+      .on("mousemove", function(event) {
+          d3.select("#tooltip")
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function(event, d) {
+          d3.select("#tooltip").style("display", "none");
+          d3.select(this)
+              .attr("fill", function(d) { return color(d.key); });
+      });
+}
 function experienciaGenderProp() {
-    // Limpa o SVG
     clean(); 
 
-    // Escalas para os dois gráficos
     const x = d3.scaleBand()
         .domain(dataset5.map(d => d.experiencia))
         .range([0, width])
@@ -905,10 +1062,37 @@ function experienciaGenderProp() {
     // Eixos
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x));
+        .style("opacity", 0)
+        .call(d3.axisBottom(x))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
 
     svg.append("g")
-        .call(d3.axisLeft(yLine));
+        .style("opacity", 0)
+        .call(d3.axisLeft(yLine))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("Tempo de experiência (anos)")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
 
     // Linhas
     const lineMasculino = d3.line()
@@ -919,58 +1103,105 @@ function experienciaGenderProp() {
         .x(d => xLine(d.experiencia))
         .y(d => yLine(d.Feminino));
 
+    // Linha Masculino
     svg.append("path")
         .datum(dataset5)
         .attr("d", lineMasculino)
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke") // <- para capturar o mouse na linha
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Homens:</strong> Passe o mouse sobre os pontos para ver as proporções.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0);
 
+    // Linha Feminino
     svg.append("path")
         .datum(dataset5)
         .attr("d", lineFeminino)
         .attr("stroke", "#ff69b4")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke")
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Mulheres:</strong> Passe o mouse sobre os pontos para ver as proporções.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas
+    // Pontos nas linhas - masculino
     svg.selectAll(".circle-male")
         .data(dataset5)
         .enter()
         .append("circle")
+        .attr("class", "circle-male")
         .attr("cx", d => xLine(d.experiencia))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 4)
+        .attr("r", 0)
         .attr("fill", "#1e90ff")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-                .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
-        })
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        .on("mouseout", function() {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        });
+        .transition()
+        .duration(800)
+        .attr("r", 4);
 
+    // Pontos nas linhas - feminino
     svg.selectAll(".circle-female")
         .data(dataset5)
         .enter()
         .append("circle")
+        .attr("class", "circle-female")
         .attr("cx", d => xLine(d.experiencia))
         .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 4)
+        .attr("r", 0)
         .attr("fill", "#ff69b4")
+        .transition()
+        .duration(800)
+        .attr("r", 4);
+
+    // Tooltip dos pontos - masculino
+    svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção (Homens):</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -979,27 +1210,66 @@ function experienciaGenderProp() {
         })
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#1e90ff");
+        });
+
+    // Tooltip dos pontos - feminino
+    svg.selectAll(".circle-female")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção (Mulheres):</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#ff69b4");
         });
 
     // Barras de diferença (Feminino - Masculino)
-    svg.selectAll("rect")
+    svg.selectAll(".diff-bar")
         .data(dataset5)
         .enter()
         .append("rect")
+        .attr("class", "diff-bar")
         .attr("x", d => x(d.experiencia))
+        .attr("y", yDiff(0))
+        .attr("width", x.bandwidth())
+        .attr("height", 0)
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+        .attr("opacity", 0.5)
+        .transition()
+        .duration(1000)
         .attr("y", d => d.Feminino - d.Masculino >= 0
             ? yDiff(d.Feminino - d.Masculino)
             : yDiff(0))
-        .attr("width", x.bandwidth())
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
-        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
-        .attr("opacity", 0.5)
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Tooltip nas barras de diferença
+    svg.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
                 .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
-            d3.select(this).attr("fill", "#339999");
+            d3.select(this)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -1008,9 +1278,12 @@ function experienciaGenderProp() {
         })
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
+            d3.select(this)
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 }
+
+
 
 
 function nivelGenderAbsBar() {
@@ -1019,84 +1292,111 @@ function nivelGenderAbsBar() {
     const groups = dataset6.map(d => d.nivel);
     // console.log(groups);
 
-    clean();
+    clean(); // Limpa o SVG
+
     // Escala x para os grupos (categorias de ensino)
     var x = d3.scaleBand()
-      .domain(groups)
-      .range([0, width])
-      .padding([0.2])
-  svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).tickSize(0));
-    
+        .domain(groups)
+        .range([0, width])
+        .padding([0.2]);
+
+    // Escala y para os valores
     var y = d3.scaleLinear()
-      .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
-      .nice()
-      .range([height, 0]);
+        .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
+        .nice()
+        .range([height, 0]);
 
-    //   console.log(d3.max(dataset, d => Math.max(d.Masculino, d.Feminino)));
-
-      svg.append("g")
-      .call(d3.axisLeft(y));
-
-      var xSubgroup = d3.scaleBand()
-    .domain(subgroups)
-    .range([0, x.bandwidth()])
-    .padding([0.05])
+    // Escala interna para subgrupos (Masculino/Feminino dentro de cada grupo)
+    var xSubgroup = d3.scaleBand()
+        .domain(subgroups)
+        .range([0, x.bandwidth()])
+        .padding([0.05]);
 
     // Cores
     const color = d3.scaleOrdinal()
-      .domain(subgroups)
-      .range(["#1e90ff", "#ff69b4"]);
+        .domain(subgroups)
+        .range(["#1e90ff", "#ff69b4"]);
 
-    // Eixo X
+    // Eixo X com animação de opacidade
+    const xAxis = svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .style("opacity", 0);
+
+    xAxis.transition()
+        .duration(800)
+        .style("opacity", 1)
+        .call(d3.axisBottom(x).tickSize(0))
+        .attr("font-size", "13.5px");
+
+    // Eixo Y com animação de opacidade
+    const yAxis = svg.append("g")
+        .style("opacity", 0);
+
+    yAxis.transition()
+        .duration(800)
+        .style("opacity", 1)
+        .call(d3.axisLeft(y));
+
+    // Criação das barras
     svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset6)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.nivel)+ ",0)" })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); });
- 
-  // Show the bars
-  svg.append("g")
-    .selectAll("g")
-    // Enter in data = loop group per group
-    .data(dataset6)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.nivel) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return color(d.key); })
-      .on("mouseover", function(event, d) {
-        d3.select("#tooltip")
-            .style("display", "block")
-            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-        d3.select(this).attr("fill", "#339999");
-    })
-    .on("mousemove", function(event) {
-        d3.select("#tooltip")
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 20) + "px");
-    })
-    .on("mouseout", function(event, d) {
-        d3.select("#tooltip").style("display", "none");
-        d3.select(this).attr("fill", function(d) { return color(d.key); });
-    });
+        .selectAll("g")
+        .data(dataset6)
+        .enter()
+        .append("g")
+            .attr("transform", d => `translate(${x(d.nivel)},0)`)
+        .selectAll("rect")
+        .data(d => subgroups.map(key => ({ key: key, value: d[key] })))
+        .enter()
+        .append("rect")
+            .attr("x", d => xSubgroup(d.key))
+            .attr("y", y(0)) // começa do chão
+            .attr("width", xSubgroup.bandwidth())
+            .attr("height", 0) // altura inicial 0
+            .attr("fill", d => color(d.key))
+            .transition()
+            .duration(1000)
+            .attr("y", d => y(d.value))
+            .attr("height", d => height - y(d.value));
+
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Média salarial")
+        .style("opacity", 0.6);
+
+    // Interação nas barras
+    svg.selectAll("g")
+        .selectAll("rect")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+            d3.select(this)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .attr("fill", d => color(d.key));
+        });
 }
 
 function nivelGenderProp() {
@@ -1127,15 +1427,43 @@ function nivelGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // Eixos
+    // Eixos com animação de opacidade
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x));
+        .style("opacity", 0)
+        .call(d3.axisBottom(x))
+        .transition()
+        .duration(800)
+        .style("opacity", 1)
+        .attr("font-size", "14px");
 
     svg.append("g")
-        .call(d3.axisLeft(yLine));
+        .style("opacity", 0)
+        .call(d3.axisLeft(yLine))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
 
-    // Linhas
+    // Título do eixo X
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .attr("font-size", "14px")
+        .text("")
+        .style("opacity", 0.6);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -35)
+        .attr("font-size", "14px")
+        .text("Proporção (%)")
+        .style("opacity", 0.6);
+
+    // Linhas com animação de desenhar
     const lineMasculino = d3.line()
         .x(d => xLine(d.nivel))
         .y(d => yLine(d.Masculino));
@@ -1149,53 +1477,66 @@ function nivelGenderProp() {
         .attr("d", lineMasculino)
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0);
 
     svg.append("path")
         .datum(dataset7)
         .attr("d", lineFeminino)
         .attr("stroke", "#ff69b4")
         .attr("fill", "none")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", function() { return this.getTotalLength(); })
+        .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
+        .transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas
+    // Pontos nas linhas - masculino
     svg.selectAll(".circle-male")
         .data(dataset7)
         .enter()
         .append("circle")
+        .attr("class", "circle-male")
         .attr("cx", d => xLine(d.nivel))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 4)
+        .attr("r", 0) // começa com raio 0
         .attr("fill", "#1e90ff")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-                .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
-        })
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        .on("mouseout", function() {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        });
+        .transition()
+        .duration(800)
+        .attr("r", 4);
 
+    // Pontos nas linhas - feminino
     svg.selectAll(".circle-female")
         .data(dataset7)
         .enter()
         .append("circle")
+        .attr("class", "circle-female")
         .attr("cx", d => xLine(d.nivel))
         .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 4)
+        .attr("r", 0) // começa com raio 0
         .attr("fill", "#ff69b4")
+        .transition()
+        .duration(800)
+        .attr("r", 4);
+
+    // Interações dos pontos - masculino
+    svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -1204,27 +1545,66 @@ function nivelGenderProp() {
         })
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#1e90ff");
         });
 
-    // Barras de diferença (Feminino - Masculino)
-    svg.selectAll("rect")
+    // Interações dos pontos - feminino
+    svg.selectAll(".circle-female")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this)
+                .transition()
+                .duration(100)
+                .attr("r", 8)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("r", 4)
+                .attr("fill", "#ff69b4");
+        });
+
+    // Barras de diferença (Feminino - Masculino) com animação
+    svg.selectAll(".diff-bar")
         .data(dataset7)
         .enter()
         .append("rect")
+        .attr("class", "diff-bar")
         .attr("x", d => x(d.nivel))
+        .attr("y", yDiff(0)) // começa no meio
+        .attr("width", x.bandwidth())
+        .attr("height", 0) // altura inicial 0
+        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+        .attr("opacity", 0.5)
+        .transition()
+        .duration(1000)
         .attr("y", d => d.Feminino - d.Masculino >= 0
             ? yDiff(d.Feminino - d.Masculino)
             : yDiff(0))
-        .attr("width", x.bandwidth())
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
-        .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
-        .attr("opacity", 0.5)
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Interação nas barras de diferença
+    svg.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
                 .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
-            d3.select(this).attr("fill", "#339999");
+            d3.select(this)
+                .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -1233,7 +1613,8 @@ function nivelGenderProp() {
         })
         .on("mouseout", function(event, d) {
             d3.select("#tooltip").style("display", "none");
-            d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
+            d3.select(this)
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 }
 
