@@ -31,6 +31,15 @@ d3.csv("grouped_income_gender.csv").then(data => {
     }));
 });
 
+d3.csv("motivos_satisfacao.csv").then(data => {
+    dataset8 = data.map(d => ({
+        motivo: d.motivo,
+        Prop_homem: +d.Prop_homem,
+        Prop_mulher: +d.Prop_mulher,
+        quantidade: +d.Quantidade,
+    }));
+});
+
 d3.csv("grouped_salario_prop.csv").then(data => {
     dataset2 = data.map(d => ({
         ensino: d.Ensino.trim(),
@@ -917,7 +926,7 @@ function experienciaGenderAbsBar() {
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset4.map(d => d.experiencia);
-    console.log(groups);
+    // console.log(groups);
 
     clean(); // Limpa o SVG
 
@@ -1284,7 +1293,7 @@ function nivelGenderAbsBar() {
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset6.map(d => d.nivel);
-    console.log(groups);
+    // console.log(groups);
 
     clean(); // Limpa o SVG
 
@@ -1616,6 +1625,90 @@ function nivelGenderProp() {
         });
 }
 
+function wordCloud() {
+    clean();
+
+    const sizeScale = d3.scaleLinear()
+        .domain(d3.extent(dataset8, d => d.quantidade))
+        .range([10, 45]);
+
+    const words = dataset8.map(d => ({
+        text: d.motivo,
+        size: sizeScale(d.quantidade),
+        Quantidade: +d.quantidade,
+        Prop_homem: +d.Prop_homem,
+        Prop_mulher: +d.Prop_mulher
+        }));
+    
+    svg.append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("font-family", "sans-serif")
+    .style("text-anchor", "middle")
+    .attr("id", "wordcloud-svg"); 
+
+    const g = svg.append("g")
+                .attr("transform", `translate(${width/6}, ${height/2})`);
+
+    const layout = d3.layout.cloud()
+        .size([width, height])
+        .words(words)
+        .padding(2)
+        .rotate(() => 0)
+        .font("sans-serif")
+        .fontSize(d => d.size)
+        .on("end", draw);
+
+    layout.start();
+
+    // Tooltip (garante que só tenha um)
+    let tooltip = d3.select("#tooltip");
+    if (tooltip.empty()) {
+        tooltip = d3.select("body")
+        .append("div")
+        .attr("id", "tooltip")
+        .style("position", "absolute")
+        .style("background", "rgba(0,0,0,0.8)")
+        .style("color", "white")
+        .style("padding", "6px 10px")
+        .style("border-radius", "4px")
+        .style("font-size", "14px")
+        .style("pointer-events", "none")
+        .style("display", "none");
+    }
+
+    function draw(words) 
+        {
+            g.selectAll("text")
+            .data(words)
+            .enter()
+            .append("text")
+            .attr("font-size", d => d.size)
+            .attr("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"))
+            .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+            .text(d => d.text)
+        .on("mouseover", function (event, d) {
+        tooltip.style("display", "block")
+            .html(`
+            Citado por ${(Math.round((d.Prop_homem) * 10) / 10)}% dos homens 👨<br>
+            Citado por ${(Math.round((d.Prop_mulher) * 10) / 10)}% das mulheres 👩
+            `);
+        
+        d3.select(this).style("fill", "#339999");
+        })
+        .on("mousemove", function (event) {
+        tooltip
+            .style("left", (event.pageX + 15) + "px")
+            .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function (event, d) {
+        tooltip.style("display", "none");
+        d3.select(this).style("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"));
+        });
+    }
+
+}
+
 window.drawPyr = drawPyr;
 window.salarioGenderProp = salarioGenderProp;
 window.activationFunctions = [
@@ -1626,7 +1719,8 @@ window.activationFunctions = [
     experienciaGenderProp,
     experienciaGenderAbsBar,
     nivelGenderAbsBar, // index 4
-    nivelGenderProp  // index 4
+    nivelGenderProp,  // index 4
+    wordCloud
 ];
 
 
