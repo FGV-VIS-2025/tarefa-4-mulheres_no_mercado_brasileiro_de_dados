@@ -247,12 +247,14 @@ function drawPyr() {
         .attr("x", width / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
+        .attr("fill", "#ff0080")
         .text("Mulheres");
 
     svg.append("text")
         .attr("x", (3 * width) / 4)
         .attr("y", height + 40)
         .attr("text-anchor", "middle")
+        .attr("fill", "#007af2")
         .text("Homens");
 
     // Título do eixo X
