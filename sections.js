@@ -831,8 +831,6 @@ function salarioGenderProp() {
         });
 }
 
-
-
 function ensinoGenderProp() {
     clean(); // Limpa o SVG
 
@@ -1235,55 +1233,53 @@ function ensinoGenderAbsBar() {
 
 
 
-      // Camada para destaque de fundo
-    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+      // Interação no texto destacado
+d3.selectAll(".highlight-education")
+.on("mouseover", function(event) {
+    const educations = d3.select(this).attr("data-education").split(",");
 
-    // Interação no texto destacado
-    d3.selectAll(".highlight-education")
-    .on("mouseover", function(event) {
-        const educations = d3.select(this).attr("data-education").split(",");
-
-        const gruposSelecionados = dataset3.filter(d => 
-            educations.includes(d.ensino.trim())
-        );
-
-        if (gruposSelecionados.length === 0) return;
-
-        const primeiraFaixa = gruposSelecionados[0].ensino.trim();
-        const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].ensino.trim();
-
-        const xInicio = x(primeiraFaixa);
-        const xFim = x(ultimaFaixa) + x.bandwidth();
-
-        backgroundHighlight.selectAll("rect").remove();
-
-        backgroundHighlight.append("rect")
-        .attr("x", xInicio)
-        .attr("y", 0)
-        .attr("width", xFim - xInicio)
-        .attr("height", height)
-        .attr("fill", "#e0e0e0")
-        .attr("opacity", 0.4);
-
-        svg.selectAll("rect")
-        // .filter(function(d) {
-        //     return d && d.key && d.value && educations.includes(this.parentNode.__data__.ensino.trim());
-        // })
+    // Destaca as barras selecionadas
+    svg.selectAll("g")
+        .selectAll("rect")
+        .filter(function(d) {
+            return d && d.key && this.parentNode.__data__ && educations.includes(this.parentNode.__data__.ensino.trim());
+        })
         .transition()
         .duration(200)
-        .attr("fill", d => color(d.key));
-    })
-    .on("mouseout", function(event) {
-        backgroundHighlight.selectAll("rect").remove();
+        .attr("opacity", 1) // Opacidade total para as barras destacadas
+        .attr("stroke", "black") // Aplica borda preta
+        .attr("stroke-width", 2); // Define a largura da borda
 
-        svg.selectAll("rect")
+    // Esbranquece as barras não selecionadas
+    svg.selectAll("g")
+        .selectAll("rect")
+        .filter(function(d) {
+            return d && d.key && this.parentNode.__data__ && !educations.includes(this.parentNode.__data__.ensino.trim());
+        })
         .transition()
         .duration(200)
-        .attr("fill", d => color(d.key));
-    });
+        .attr("opacity", 0.2) // Diminui a opacidade para as barras não selecionadas
+        .attr("fill", "#d3d3d3") // Muda a cor para um tom de cinza para esbranquiçar
+        .attr("stroke", "none") // Remove borda
+        .attr("stroke-width", 0); // Remove a largura da borda
+})
+.on("mouseout", function(event) {
+    // Remove o fundo de destaque
+    svg.select("g.background-highlight").selectAll("rect").remove();
+
+    // Restaura todas as barras ao estado original
+    svg.selectAll("g")
+        .selectAll("rect")
+        .transition()
+        .duration(200)
+        .attr("opacity", 1) // Restaura a opacidade para todas as barras
+        .attr("fill", function(d) { return color(d.key); }) // Restaura a cor original
+        .attr("stroke", "none") // Remove borda
+        .attr("stroke-width", 0); // Remove a largura da borda
+});
+
 
 }
-
 
 function experienciaGenderAbsBar() {
 
@@ -1377,73 +1373,51 @@ function experienciaGenderAbsBar() {
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
 
-    // Interação nas barras
-    barGroups.selectAll("rect")
-      .on("mouseover", function(event, d) {
-          d3.select("#tooltip")
-              .style("display", "block")
-              .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-          d3.select(this)
-              .attr("fill", "#339999");
-      })
-      .on("mousemove", function(event) {
-          d3.select("#tooltip")
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mouseout", function(event, d) {
-          d3.select("#tooltip").style("display", "none");
-          d3.select(this)
-              .attr("fill", function(d) { return color(d.key); });
-      });
+        d3.selectAll(".highlight-experience")
+    .on("mouseover", function(event) {
+        const experiences = d3.select(this).attr("data-experience").split(",").map(Number); 
 
-       // Camada para fundo de destaque
-    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
-
-    d3.selectAll(".highlight-experience")
-      .on("mouseover", function(event) {
-          const experiences = d3.select(this).attr("data-experience").split(",").map(Number);
-
-          const gruposSelecionados = dataset4.filter(d => 
-              experiences.includes(Number(d.experiencia))
-          );
-
-          if (gruposSelecionados.length === 0) return;
-
-          const primeiraFaixa = gruposSelecionados[0].experiencia;
-          const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].experiencia;
-
-          const xInicio = x(primeiraFaixa);
-          const xFim = x(ultimaFaixa) + x.bandwidth();
-
-          backgroundHighlight.selectAll("rect").remove();
-
-          backgroundHighlight.append("rect")
-              .attr("x", xInicio)
-              .attr("y", 0)
-              .attr("width", xFim - xInicio)
-              .attr("height", height)
-              .attr("fill", "#e0e0e0")
-              .attr("opacity", 0.4);
-
-          svg.selectAll("g")
+        // Destaca as barras selecionadas
+        svg.selectAll("g")
             .selectAll("rect")
             .filter(function(d) {
                 return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
             })
             .transition()
             .duration(200)
-            ;
-      })
-      .on("mouseout", function(event) {
-          backgroundHighlight.selectAll("rect").remove();
+            .attr("opacity", 1) // Opacidade total para as barras destacadas
+            .attr("stroke", "black") // Aplica borda preta
+            .attr("stroke-width", 2); // Define a largura da borda
 
-          svg.selectAll("g")
+        // Esbranquece as barras não selecionadas
+        svg.selectAll("g")
+            .selectAll("rect")
+            .filter(function(d) {
+                return d && d.key && this.parentNode.__data__ && !experiences.includes(Number(this.parentNode.__data__.experiencia));
+            })
+            .transition()
+            .duration(200)
+            .attr("opacity", 0.2) // Diminui a opacidade para as barras não selecionadas
+            .attr("fill", "#d3d3d3") // Muda a cor para um tom de cinza para esbranquiçar
+            .attr("stroke", "none") // Remove borda
+            .attr("stroke-width", 0); // Remove a largura da borda
+    })
+    .on("mouseout", function(event) {
+        // Remove o fundo de destaque
+        svg.select("g.background-highlight").selectAll("rect").remove();
+
+        // Restaura todas as barras ao estado original
+        svg.selectAll("g")
             .selectAll("rect")
             .transition()
             .duration(200)
-            .attr("fill", d => d ? color(d.key) : null);
-      });
+            .attr("opacity", 1) // Restaura a opacidade para todas as barras
+            .attr("fill", function(d) { return color(d.key); }) // Restaura a cor original
+            .attr("stroke", "none") // Remove borda
+            .attr("stroke-width", 0); // Remove a largura da borda
+    });
+
+      
       
 }
 
@@ -1748,14 +1722,10 @@ d3.selectAll(".highlight-experience")
   });
 }
 
-
-
-
 function nivelGenderAbsBar() {
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset6.map(d => d.nivel);
-    // console.log(groups);
 
     clean(); // Limpa o SVG
 
@@ -1809,20 +1779,25 @@ function nivelGenderAbsBar() {
         .enter()
         .append("g")
             .attr("transform", d => `translate(${x(d.nivel)},0)`)
-        .selectAll("rect")
-        .data(d => subgroups.map(key => ({ key: key, value: d[key] })))
-        .enter()
-        .append("rect")
-            .attr("x", d => xSubgroup(d.key))
-            .attr("y", y(0)) // começa do chão
-            .attr("width", xSubgroup.bandwidth())
-            .attr("height", 0) // altura inicial 0
-            .attr("fill", d => color(d.key))
-            .transition()
-            .duration(800)
-            .ease(d3.easeQuadIn)
-            .attr("y", d => y(d.value))
-            .attr("height", d => height - y(d.value));
+            .each(function(d) {
+                const nivelAtual = d.nivel; // Salva o nível atual
+                d3.select(this)
+                    .selectAll("rect")
+                    .data(subgroups.map(key => ({ key: key, value: d[key], nivel: nivelAtual }))) // Passa o nível junto
+                    .enter()
+                    .append("rect")
+                        .attr("x", d => xSubgroup(d.key))
+                        .attr("y", y(0))
+                        .attr("width", xSubgroup.bandwidth())
+                        .attr("height", 0)
+                        .attr("fill", d => color(d.key))
+                        .attr("data-nivel", d => d.nivel) // Adiciona data-nivel no rect
+                        .transition()
+                        .duration(800)
+                        .ease(d3.easeQuadIn)
+                        .attr("y", d => y(d.value))
+                        .attr("height", d => height - y(d.value));
+            });
 
     // Título do eixo X
     svg.append("text")
@@ -1862,6 +1837,46 @@ function nivelGenderAbsBar() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this)
                 .attr("fill", d => color(d.key));
+        });
+
+    // Highlight no gráfico ao passar o mouse sobre o texto
+    d3.selectAll(".highlight-income-jp")
+        .on("mouseover", function(event) {
+            // Destaca as barras de Júnior e Pleno
+            svg.selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("opacity", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? 1 : 0.2)
+                .attr("stroke", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? "black" : "none")
+                .attr("stroke-width", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? 2 : 0);
+        })
+        .on("mouseout", function(event) {
+            svg.selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("opacity", 1)
+                .attr("stroke", "none")
+                .attr("stroke-width", 0);
+        });
+
+    // Highlight no gráfico ao passar o mouse sobre o texto de "Sênior"
+    d3.selectAll(".highlight-income-senior")
+        .on("mouseover", function(event) {
+            // Destaca apenas as barras de Sênior
+            svg.selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("opacity", d => d.nivel === "Sênior" ? 1 : 0.2)
+                .attr("stroke", d => d.nivel === "Sênior" ? "black" : "none")
+                .attr("stroke-width", d => d.nivel === "Sênior" ? 2 : 0);
+        })
+        .on("mouseout", function(event) {
+            svg.selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("opacity", 1)
+                .attr("stroke", "none")
+                .attr("stroke-width", 0);
         });
 }
 
@@ -2162,16 +2177,16 @@ function wordCloud() {
         Quantidade: +d.quantidade,
         Prop_homem: +d.Prop_homem,
         Prop_mulher: +d.Prop_mulher
-        }));
-    
-    svg//.append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .style("font-family", "sans-serif")
-    .style("text-anchor", "middle")
+    }));
+
+    svg
+        .attr("width", width)
+        .attr("height", height)
+        .style("font-family", "sans-serif")
+        .style("text-anchor", "middle");
 
     const g = svg.append("g")
-                .attr("transform", `translate(${width/2},${height/2})`);
+        .attr("transform", `translate(${width/2},${height/2})`);
 
     const layout = d3.layout.cloud()
         .size([width, height])
@@ -2184,49 +2199,65 @@ function wordCloud() {
 
     layout.start();
 
-    // Tooltip (garante que só tenha um)
+    // Inicialize o tooltip aqui para garantir que não ocorra erro de escopo
     let tooltip = d3.select("#tooltip");
     if (tooltip.empty()) {
         tooltip = d3.select("body")
-        .append("div")
-        .attr("id", "tooltip")
-        .style("position", "absolute")
-        .style("background", "rgba(0,0,0,0.8)")
-        .style("color", "white")
-        .style("padding", "6px 10px")
-        .style("border-radius", "4px")
-        .style("font-size", "14px")
-        .style("pointer-events", "none")
-        .style("display", "none");
+            .append("div")
+            .attr("id", "tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(0,0,0,0.8)")
+            .style("color", "white")
+            .style("padding", "6px 10px")
+            .style("border-radius", "4px")
+            .style("font-size", "14px")
+            .style("pointer-events", "none")
+            .style("display", "none");
     }
 
-    function draw(words) 
-        {
-            g.selectAll("text")
+    function draw(words) {
+        const wordElements = g.selectAll("text")
             .data(words)
             .join("text")
             .attr("font-size", d => d.size)
             .attr("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"))
             .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
             .text(d => d.text)
-        .on("mouseover", function (event, d) {
-        tooltip.style("display", "block")
-            .html(`
-            Citado por ${(Math.round((d.Prop_homem) * 10) / 10)}% dos homens 👨<br>
-            Citado por ${(Math.round((d.Prop_mulher) * 10) / 10)}% das mulheres 👩
-            `);
-        
-        d3.select(this).style("fill", "#339999");
-        })
-        .on("mousemove", function (event) {
-        tooltip
-            .style("left", (event.pageX + 15) + "px")
-            .style("top", (event.pageY - 20) + "px");
-        })
-        .on("mouseout", function (event, d) {
-        tooltip.style("display", "none");
-        d3.select(this).style("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"));
-        });
+            .on("mouseover", function (event, d) {
+                tooltip.style("display", "block")
+                    .html(`
+                    Citado por ${(Math.round((d.Prop_homem) * 10) / 10)}% dos homens 👨<br>
+                    Citado por ${(Math.round((d.Prop_mulher) * 10) / 10)}% das mulheres 👩
+                    `);
+                
+                d3.select(this).style("fill", "#339999");
+            })
+            .on("mousemove", function (event) {
+                tooltip
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+            })
+            .on("mouseout", function (event, d) {
+                tooltip.style("display", "none");
+                d3.select(this).style("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"));
+            });
+
+        // Interação com o texto HTML usando a classe "income"
+        d3.selectAll(".income")
+            .on("mouseover", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", "50px")  // Aumenta o tamanho da palavra
+                    .style("font-weight", "bold");
+            })
+            .on("mouseout", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", d => d.size + "px")  // Retorna ao tamanho original
+                    .style("font-weight", "normal");
+            });
     }
 
     const legend = svg.append("g")
@@ -2358,7 +2389,7 @@ function wordCloudWoman() {
 
     function draw(words) 
         {
-            g.selectAll("text")
+            const wordElements = g.selectAll("text")
             .data(words)
             .join("text")
             .attr("font-size", d => d.size)
@@ -2382,6 +2413,24 @@ function wordCloudWoman() {
         tooltip.style("display", "none");
         d3.select(this).style("fill", "#ff69b4");
         });
+
+        // Interação com o texto HTML usando a classe "income"
+        d3.selectAll(".income")
+            .on("mouseover", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", "50px")  // Aumenta o tamanho da palavra
+                    .style("font-weight", "bold");
+            })
+            .on("mouseout", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", d => d.size + "px")  // Retorna ao tamanho original
+                    .style("font-weight", "normal");
+                    tooltip.style("display", "none");
+            });
     }
 
     const legend = svg.append("g")
@@ -2512,7 +2561,7 @@ function wordCloudMan() {
 
     function draw(words) 
         {
-            g.selectAll("text")
+            const wordElements = g.selectAll("text")
             .data(words)
             .join("text")
             .attr("font-size", d => d.size)
@@ -2536,6 +2585,24 @@ function wordCloudMan() {
         tooltip.style("display", "none");
         d3.select(this).style("fill", "#1e90ff");
         });
+
+        // Interação com o texto HTML usando a classe "income"
+        d3.selectAll(".income")
+            .on("mouseover", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", "50px")  // Aumenta o tamanho da palavra
+                    .style("font-weight", "bold");
+            })
+            .on("mouseout", function() {
+                wordElements.filter(d => d.text === "Remuneração")
+                    .transition()
+                    .duration(500)
+                    .style("font-size", d => d.size + "px")  // Retorna ao tamanho original
+                    .style("font-weight", "normal");
+                    tooltip.style("display", "none");
+            });
     }
 
     const legend = svg.append("g")
@@ -2614,8 +2681,6 @@ function wordCloudMan() {
         .style("pointer-events", "none")
         .text("Geral");
 }
-
-
 
 function drawBubbleChart() {
     expandSVG();
