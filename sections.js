@@ -1917,6 +1917,68 @@ function nivelGenderProp() {
             d3.select(this)
                 .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
+
+    // Camada para fundo de destaque (antes das linhas e barras)
+const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+// Interação no texto destacado
+d3.selectAll(".highlight-senior1")
+    .on("mouseover", function(event) {
+        const niveis = d3.select(this).attr("data-experience").split(",").map(Number);
+
+        const gruposSelecionados = dataset7.filter(d => 
+            niveis.includes(Number(d.nivel))
+        );
+
+        if (gruposSelecionados.length === 0) return;
+
+        const primeiroNivel = gruposSelecionados[0].nivel;
+        const ultimoNivel = gruposSelecionados[gruposSelecionados.length - 1].nivel;
+
+        const xInicio = x(primeiroNivel);
+        const xFim = x(ultimoNivel) + x.bandwidth();
+
+        backgroundHighlight.selectAll("rect").remove();
+
+        backgroundHighlight.append("rect")
+            .attr("x", xInicio)
+            .attr("y", 0)
+            .attr("width", xFim - xInicio)
+            .attr("height", height)
+            .attr("fill", "#e0e0e0")
+            .attr("opacity", 0.4);
+
+        // Destacar círculos (pontos) relacionados
+        svg.selectAll("circle")
+            .filter(d => niveis.includes(Number(d.nivel)))
+            .transition()
+            .duration(200)
+            .attr("r", 10);
+
+        // Clarear barras de diferença
+        svg.selectAll(".diff-bar")
+            .filter(d => niveis.includes(Number(d.nivel)))
+            .transition()
+            .duration(200);
+            // .attr("fill", "#c8c8c8");
+    })
+    .on("mouseout", function(event) {
+        backgroundHighlight.selectAll("rect").remove();
+
+        svg.selectAll("circle")
+            .transition()
+            .duration(200)
+            .attr("r", 4);
+
+        svg.selectAll(".diff-bar")
+            .transition()
+            .duration(200)
+            .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+            .attr("opacity", 0.5);
+    });
+
+
+        
 }
 
 function wordCloud() {
@@ -2591,8 +2653,8 @@ window.activationFunctions = [
     ensinoGenderAbsBar, // index 3
     experienciaGenderProp,
     experienciaGenderAbsBar,
+    nivelGenderProp, 
     nivelGenderAbsBar, // index 4
-    nivelGenderProp,  // index 4
     wordCloud
 ];
 
