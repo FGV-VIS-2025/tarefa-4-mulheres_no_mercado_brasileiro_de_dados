@@ -894,6 +894,62 @@ function ensinoGenderProp() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
+
+
+
+
+        // Camada para destacar background
+    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+    // Interação no texto destacado
+    d3.selectAll(".highlight-education")
+        .on("mouseover", function(event) {
+            const educations = d3.select(this).attr("data-education").split(",");
+
+            const faixasNoIntervalo = dataset2.filter(d => 
+                educations.includes(d.ensino.trim())
+            );
+
+            if (faixasNoIntervalo.length === 0) return;
+
+            const primeiraFaixa = faixasNoIntervalo[0].ensino.trim();
+            const ultimaFaixa = faixasNoIntervalo[faixasNoIntervalo.length - 1].ensino.trim();
+
+            const xInicio = x(primeiraFaixa);
+            const xFim = x(ultimaFaixa) + x.bandwidth();
+
+            backgroundHighlight.selectAll("rect").remove();
+
+            backgroundHighlight.append("rect")
+                .attr("x", xInicio)
+                .attr("y", 0)
+                .attr("width", xFim - xInicio)
+                .attr("height", height)
+                .attr("fill", "#e0e0e0")
+                .attr("opacity", 0.4);
+
+            // svg.selectAll("rect.diff-bar")
+            //     .filter(d => educations.includes(d.ensino.trim()))
+            //     .attr("fill", "#c8c8c8");
+
+            svg.selectAll("circle")
+                .filter(d => educations.includes(d.ensino.trim()))
+                .transition()
+                .duration(200)
+                .attr("r", 8);
+        })
+        .on("mouseout", function(event) {
+            backgroundHighlight.selectAll("rect").remove();
+
+            svg.selectAll("rect.diff-bar")
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+                .attr("opacity", 0.5);
+
+            svg.selectAll("circle")
+                .transition()
+                .duration(200)
+                .attr("r", 4);
+        });
 }
 
 function ensinoGenderAbsBar() {
