@@ -410,12 +410,9 @@ function drawPyr() {
     });
 
 }
-
 function salarioGenderProp() {
-    // Limpa o SVG
-    clean(); 
+    clean();
 
-    // Escalas para os dois gráficos
     const x = d3.scaleBand()
         .domain(dataset1.map(d => d.faixa_salarial.trim()))
         .range([0, width])
@@ -439,23 +436,23 @@ function salarioGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // Eixos (agora com transição de opacidade)
+    // Eixos
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
         .call(d3.axisBottom(x))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
 
     svg.append("g")
         .style("opacity", 0)
         .call(d3.axisLeft(yLine))
         .transition()
-        .duration(1000)
+        .duration(800)
         .style("opacity", 1);
 
-    // Título do eixo X
+    // Títulos
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
@@ -464,7 +461,6 @@ function salarioGenderProp() {
         .text("Faixa Salarial")
         .style("opacity", 0.6);
 
-    // Título do eixo Y
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
@@ -490,10 +486,27 @@ function salarioGenderProp() {
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
         .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke")
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Homens:</strong> Passe o mouse sobre os pontos.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
     // Linha feminino
@@ -503,26 +516,66 @@ function salarioGenderProp() {
         .attr("stroke", "#ff69b4")
         .attr("fill", "none")
         .attr("stroke-width", 2)
+        .attr("pointer-events", "stroke")
+        .on("mouseover", function(event) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Mulheres:</strong> Passe o mouse sobre os pontos.`);
+            d3.select(this).attr("stroke-width", 4);
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("stroke-width", 2);
+        })
         .attr("stroke-dasharray", function() { return this.getTotalLength(); })
         .attr("stroke-dashoffset", function() { return this.getTotalLength(); })
         .transition()
-        .duration(1000)
+        .duration(800)
+        .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas (masculino)
+    // Pontos masculino
     svg.selectAll(".circle-male")
         .data(dataset1)
         .enter()
         .append("circle")
+        .attr("class", "circle-male")
         .attr("cx", d => xLine(d.faixa_salarial.trim()))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 0) // começa raio 0
+        .attr("r", 0)
         .attr("fill", "#1e90ff")
+        .transition()
+        .duration(800)
+        .ease(d3.easeQuadIn)
+        .attr("r", 4);
+
+    // Pontos feminino
+    svg.selectAll(".circle-female")
+        .data(dataset1)
+        .enter()
+        .append("circle")
+        .attr("class", "circle-female")
+        .attr("cx", d => xLine(d.faixa_salarial.trim()))
+        .attr("cy", d => yLine(d.Feminino))
+        .attr("r", 0)
+        .attr("fill", "#ff69b4")
+        .transition()
+        .duration(800)
+        .ease(d3.easeQuadIn)
+        .attr("r", 4);
+
+    // Interação pontos - masculino
+    svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Masculino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção (Homens):</strong> ${Math.round(d.Masculino * 10) / 10}%`);
+            d3.select(this).transition().duration(100).attr("r", 8).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -532,25 +585,15 @@ function salarioGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#1e90ff");
-        })
-        .transition()
-        .duration(800)
-        .attr("r", 4);
+        });
 
-    // Pontos nas linhas (feminino)
+    // Interação pontos - feminino
     svg.selectAll(".circle-female")
-        .data(dataset1)
-        .enter()
-        .append("circle")
-        .attr("cx", d => xLine(d.faixa_salarial.trim()))
-        .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 0) // começa raio 0
-        .attr("fill", "#ff69b4")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Proporção:</strong> ${Math.round(d.Feminino * 10) / 10}%`);
-            d3.select(this).transition().duration(80).attr("r", 8).attr("fill", "#339999");
+                .html(`<strong>Proporção (Mulheres):</strong> ${Math.round(d.Feminino * 10) / 10}%`);
+            d3.select(this).transition().duration(100).attr("r", 8).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
             d3.select("#tooltip")
@@ -560,26 +603,32 @@ function salarioGenderProp() {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
-        })
-        .transition()
-        .duration(800)
-        .attr("r", 4);
+        });
 
-    // Barras de diferença (Feminino - Masculino)
-    svg.selectAll("rect")
+    // Barras de diferença
+    svg.selectAll(".diff-bar")
         .data(dataset1)
         .enter()
         .append("rect")
+        .attr("class", "diff-bar")
         .attr("x", d => x(d.faixa_salarial.trim()))
-        .attr("y", yDiff(0)) // começa no meio
+        .attr("y", yDiff(0))
         .attr("width", x.bandwidth())
-        .attr("height", 0) // altura inicial 0
+        .attr("height", 0)
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
+        .transition()
+        .duration(1000)
+        .ease(d3.easeQuadIn)
+        .attr("y", d => d.Feminino - d.Masculino >= 0 ? yDiff(d.Feminino - d.Masculino) : yDiff(0))
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
+    // Interação barras
+    svg.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
-                .html(`<strong>Diferença:</strong> ${(Math.round((d.Feminino - d.Masculino) * 10) / 10)}%`);
+                .html(`<strong>Diferença:</strong> ${Math.round((d.Feminino - d.Masculino) * 10) / 10}%`);
             d3.select(this).attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
@@ -587,27 +636,90 @@ function salarioGenderProp() {
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
-        .on("mouseout", function(event, d) {
+        .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
-        })
-        .transition()
-        .duration(1000)
-        .attr("y", d => d.Feminino - d.Masculino >= 0
-            ? yDiff(d.Feminino - d.Masculino)
-            : yDiff(0))
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+        });
 
-    // Camada para destacar background
+
+
+    // const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+    // // Função auxiliar para converter coordenadas SVG para tela
+    // function getScreenCoords(svgElement, x, y) {
+    //     const point = svgElement.node().createSVGPoint();
+    //     point.x = x;
+    //     point.y = y;
+    //     const screenPoint = point.matrixTransform(svgElement.node().getScreenCTM());
+    //     return screenPoint;
+    // }
+
+    // // Destacar ponto mulher
+    // d3.selectAll(".highlight-salary-women")
+    //     .on("mouseover", function() {
+    //         const targetSalary = parseFloat(d3.select(this).attr("data-min-salary"));
+    //         const circle = svg.selectAll(".circle-female")
+    //             .filter(d => parseFloat(d.faixa_salarial) === targetSalary);
+
+    //         if (!circle.empty()) {
+    //             circle.transition().duration(200).attr("r", 12).attr("fill", "#ee4298");
+
+    //             const cx = +circle.attr("cx");
+    //             const cy = +circle.attr("cy");
+    //             const screenCoords = getScreenCoords(svg, cx, cy);
+
+    //             d3.select("#tooltip")
+    //                 .style("display", "block")
+    //                 .style("left", (screenCoords.x + 10) + "px")
+    //                 .style("top", (screenCoords.y - 30) + "px")
+    //                 .html(`<strong>Mulheres:</strong> ${Math.round(circle.datum().Feminino * 10) / 10}%`);
+    //         }
+    //     })
+    //     .on("mouseout", function() {
+    //         d3.select("#tooltip").style("display", "none");
+    //         svg.selectAll(".circle-female")
+    //             .transition().duration(200)
+    //             .attr("r", 4)
+    //             .attr("fill", "#ff69b4");
+    //     });
+
+    // // Destacar ponto homem
+    // d3.selectAll(".highlight-salary-men")
+    //     .on("mouseover", function() {
+    //         const targetSalary = parseFloat(d3.select(this).attr("data-min-salary"));
+    //         const circle = svg.selectAll(".circle-male")
+    //             .filter(d => parseFloat(d.faixa_salarial) === targetSalary);
+
+    //         if (!circle.empty()) {
+    //             circle.transition().duration(200).attr("r", 12).attr("fill", "#338ce4");
+
+    //             const cx = +circle.attr("cx");
+    //             const cy = +circle.attr("cy");
+    //             const screenCoords = getScreenCoords(svg, cx, cy);
+
+    //             d3.select("#tooltip")
+    //                 .style("display", "block")
+    //                 .style("left", (screenCoords.x + 10) + "px")
+    //                 .style("top", (screenCoords.y - 30) + "px")
+    //                 .html(`<strong>Homens:</strong> ${Math.round(circle.datum().Masculino * 10) / 10}%`);
+    //         }
+    //     })
+    //     .on("mouseout", function() {
+    //         d3.select("#tooltip").style("display", "none");
+    //         svg.selectAll(".circle-male")
+    //             .transition().duration(200)
+    //             .attr("r", 4)
+    //             .attr("fill", "#1e90ff");
+    //     });
+
     const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
 
-    // Seleciona o <b> do texto e adiciona interação
+    // Interação geral (faixa salarial toda)
     d3.selectAll(".highlight-salary")
         .on("mouseover", function(event) {
             const minFaixa = parseFloat(d3.select(this).attr("data-min-salary"));
             const maxFaixa = parseFloat(d3.select(this).attr("data-max-salary"));
 
-            // Calcula intervalo real
             const faixasNoIntervalo = dataset1.filter(d => {
                 const salario = parseFloat(d.faixa_salarial);
                 return salario >= minFaixa && salario <= maxFaixa;
@@ -622,7 +734,6 @@ function salarioGenderProp() {
             const xFim = x(ultimaFaixa) + x.bandwidth();
 
             backgroundHighlight.selectAll("rect").remove();
-
             backgroundHighlight.append("rect")
                 .attr("x", xInicio)
                 .attr("y", 0)
@@ -630,39 +741,78 @@ function salarioGenderProp() {
                 .attr("height", height)
                 .attr("fill", "#e0e0e0")
                 .attr("opacity", 0.4);
-
-            svg.selectAll("rect")
-                .filter(d => {
-                    const salario = parseFloat(d.faixa_salarial);
-                    return salario >= minFaixa && salario <= maxFaixa;
-                })
-                .attr("fill", "#c8c8c8");
-
-            svg.selectAll("circle")
-                .filter(d => {
-                    const salario = parseFloat(d.faixa_salarial);
-                    return salario >= minFaixa && salario <= maxFaixa;
-                })
-                .transition()
-                .duration(200)
-                .attr("r", 8);
-                // .attr("fill", "#1f039f");
-
         })
-        .on("mouseout", function(event) {
+        .on("mouseout", function() {
             backgroundHighlight.selectAll("rect").remove();
+        });
 
-            svg.selectAll("rect")
-                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
-                .attr("opacity", 0.5);
+    // Interação mulher (ponto específico)
+    d3.selectAll(".highlight-salary-women")
+        .on("mouseover", function(event) {
+            const targetSalary = parseFloat(d3.select(this).attr("data-min-salary"));
+            const data = dataset1.find(d => parseFloat(d.faixa_salarial) === targetSalary);
 
-            svg.selectAll("circle")
+            if (!data) return;
+
+            svg.selectAll(".circle-female")
+                .filter(d => parseFloat(d.faixa_salarial) === targetSalary)
                 .transition()
                 .duration(200)
-                .attr("r", 4);
-                // .attr("fill", d => "#1e90ff");
+                .attr("r", 12)
+                .attr("fill", "#ee4298")
+                .on("end", function(_, d) {
+                    const cx = d3.select(this).attr("cx");
+                    const cy = d3.select(this).attr("cy");
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .html(`<strong>Mulheres:</strong> ${Math.round(data.Feminino * 10) / 10}%`)
+                        .style("left", `${+cx + 100}px`)
+                        .style("top", `${+cy + 100}px`);
+                });
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            svg.selectAll(".circle-female")
+                .transition().duration(200)
+                .attr("r", 4)
+                .attr("fill", "#ff69b4");
+        });
+
+    // Interação homem (ponto específico)
+    d3.selectAll(".highlight-salary-men")
+        .on("mouseover", function(event) {
+            const targetSalary = parseFloat(d3.select(this).attr("data-min-salary"));
+            const data = dataset1.find(d => parseFloat(d.faixa_salarial) === targetSalary);
+
+            if (!data) return;
+
+            svg.selectAll(".circle-male")
+                .filter(d => parseFloat(d.faixa_salarial) === targetSalary)
+                .transition()
+                .duration(200)
+                .attr("r", 12)
+                .attr("fill", "#338ce4")
+                .on("end", function(_, d) {
+                    const cx = d3.select(this).attr("cx");
+                    const cy = d3.select(this).attr("cy");
+                    d3.select("#tooltip")
+                        .style("display", "block")
+                        .html(`<strong>Homens:</strong> ${Math.round(data.Masculino * 10) / 10}%`)
+                        .style("left", `${+cx + 100}px`)
+                        .style("top", `${+cy + 100}px`);
+                });
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").style("display", "none");
+            svg.selectAll(".circle-male")
+                .transition().duration(200)
+                .attr("r", 4)
+                .attr("fill", "#1e90ff");
         });
 }
+
+
+
 
 
 function ensinoGenderProp() {
