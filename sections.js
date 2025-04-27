@@ -645,8 +645,9 @@ function salarioGenderProp() {
                 })
                 .transition()
                 .duration(200)
-                .attr("r", 10);
+                .attr("r", 8);
                 // .attr("fill", "#1f039f");
+
         })
         .on("mouseout", function(event) {
             backgroundHighlight.selectAll("rect").remove();
@@ -1063,6 +1064,56 @@ function ensinoGenderAbsBar() {
         d3.select("#tooltip").style("display", "none");
         d3.select(this).attr("fill", function(d) { return color(d.key); });
       });
+
+
+
+      // Camada para destaque de fundo
+    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+    // Interação no texto destacado
+    d3.selectAll(".highlight-education")
+    .on("mouseover", function(event) {
+        const educations = d3.select(this).attr("data-education").split(",");
+
+        const gruposSelecionados = dataset3.filter(d => 
+            educations.includes(d.ensino.trim())
+        );
+
+        if (gruposSelecionados.length === 0) return;
+
+        const primeiraFaixa = gruposSelecionados[0].ensino.trim();
+        const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].ensino.trim();
+
+        const xInicio = x(primeiraFaixa);
+        const xFim = x(ultimaFaixa) + x.bandwidth();
+
+        backgroundHighlight.selectAll("rect").remove();
+
+        backgroundHighlight.append("rect")
+        .attr("x", xInicio)
+        .attr("y", 0)
+        .attr("width", xFim - xInicio)
+        .attr("height", height)
+        .attr("fill", "#e0e0e0")
+        .attr("opacity", 0.4);
+
+        svg.selectAll("rect")
+        // .filter(function(d) {
+        //     return d && d.key && d.value && educations.includes(this.parentNode.__data__.ensino.trim());
+        // })
+        .transition()
+        .duration(200)
+        .attr("fill", d => color(d.key));
+    })
+    .on("mouseout", function(event) {
+        backgroundHighlight.selectAll("rect").remove();
+
+        svg.selectAll("rect")
+        .transition()
+        .duration(200)
+        .attr("fill", d => color(d.key));
+    });
+
 }
 
 
@@ -1177,7 +1228,57 @@ function experienciaGenderAbsBar() {
           d3.select(this)
               .attr("fill", function(d) { return color(d.key); });
       });
+
+       // Camada para fundo de destaque
+    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+    d3.selectAll(".highlight-experience")
+      .on("mouseover", function(event) {
+          const experiences = d3.select(this).attr("data-experience").split(",").map(Number);
+
+          const gruposSelecionados = dataset4.filter(d => 
+              experiences.includes(Number(d.experiencia))
+          );
+
+          if (gruposSelecionados.length === 0) return;
+
+          const primeiraFaixa = gruposSelecionados[0].experiencia;
+          const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].experiencia;
+
+          const xInicio = x(primeiraFaixa);
+          const xFim = x(ultimaFaixa) + x.bandwidth();
+
+          backgroundHighlight.selectAll("rect").remove();
+
+          backgroundHighlight.append("rect")
+              .attr("x", xInicio)
+              .attr("y", 0)
+              .attr("width", xFim - xInicio)
+              .attr("height", height)
+              .attr("fill", "#e0e0e0")
+              .attr("opacity", 0.4);
+
+          svg.selectAll("g")
+            .selectAll("rect")
+            .filter(function(d) {
+                return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
+            })
+            .transition()
+            .duration(200)
+            ;
+      })
+      .on("mouseout", function(event) {
+          backgroundHighlight.selectAll("rect").remove();
+
+          svg.selectAll("g")
+            .selectAll("rect")
+            .transition()
+            .duration(200)
+            .attr("fill", d => d ? color(d.key) : null);
+      });
+      
 }
+
 function experienciaGenderProp() {
     clean(); 
 
@@ -1428,6 +1529,55 @@ function experienciaGenderProp() {
             d3.select(this)
                 .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
+
+        // Adiciona camada de fundo para destaque antes das barras
+const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+
+// Interação no texto destacado
+d3.selectAll(".highlight-experience")
+  .on("mouseover", function(event) {
+    const experiences = d3.select(this).attr("data-experience").split(",").map(Number);
+
+    const gruposSelecionados = dataset4.filter(d => 
+      experiences.includes(Number(d.experiencia))
+    );
+
+    if (gruposSelecionados.length === 0) return;
+
+    const primeiraFaixa = gruposSelecionados[0].experiencia;
+    const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].experiencia;
+
+    const xInicio = x(primeiraFaixa);
+    const xFim = x(ultimaFaixa) + x.bandwidth();
+
+    backgroundHighlight.selectAll("rect").remove();
+
+    backgroundHighlight.append("rect")
+      .attr("x", xInicio)
+      .attr("y", 0)
+      .attr("width", xFim - xInicio)
+      .attr("height", height)
+      .attr("fill", "#e0e0e0")
+      .attr("opacity", 0.4);
+
+    svg.selectAll("g")
+      .selectAll("rect")
+      .filter(function(d) {
+        return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
+      })
+      .transition()
+      .duration(200)
+      .attr("fill", "#c8c8c8");
+  })
+  .on("mouseout", function(event) {
+    backgroundHighlight.selectAll("rect").remove();
+
+    svg.selectAll("g")
+      .selectAll("rect")
+      .transition()
+      .duration(200)
+      .attr("fill", d => d ? color(d.key) : null);
+  });
 }
 
 
