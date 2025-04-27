@@ -194,8 +194,8 @@ function drawPyr() {
 
     // cálculo do salário médio
     const maxValue = d3.max(dataset, d => Math.max(Math.abs(d.Feminino), d.Masculino));
-    let salarioMediaMulher = d3.sum(dataset, d => Math.abs(d.Feminino) * d.faixa_salarial)/d3.sum(dataset,  d=>Math.abs(d.Feminino)); 
-    let salarioMedioHomem = d3.sum(dataset, d => d.Masculino * d.faixa_salarial)/d3.sum(dataset,  d=>Math.abs(d.Masculino));
+    let salarioMediaMulher = 8064.22; 
+    let salarioMedioHomem = 9732.58;
 
     // mapeia os valores para o domínio da tela
     const x = d3.scaleLinear()
@@ -329,6 +329,7 @@ function drawPyr() {
     
     // linha horizontal no salário médio feminino (esquerda)
     svg.append("line")
+    .attr("class", "mean-salary-line")
     .attr("x1", x(-maxValue))
     .attr("x2", x(0))
     .attr("y1", y1(salarioMediaMulher))
@@ -370,6 +371,7 @@ function drawPyr() {
 
     // linha horizontal no salário médio masculino (direita)
     svg.append("line")
+    .attr("class", "mean-salary-line")
     .attr("x1", x(0))
     .attr("x2", x(maxValue))
     .attr("y1", y1(salarioMedioHomem))
@@ -408,6 +410,24 @@ function drawPyr() {
     .on("mouseout", function() {
         d3.select("#tooltip").style("display", "none");
     });
+
+    // Seleciona o <b> que tem classe highlight-mean-salary e adiciona interação
+d3.selectAll(".highlight-mean-salary")
+.on("mouseover", function(event) {
+    // Quando passar o mouse, destaca as linhas de salário médio
+    svg.selectAll(".mean-salary-line")
+    .attr("stroke-dasharray", "4,4")
+        .attr("stroke", "red")
+        .attr("stroke-width", 4)
+        .attr("stroke-opacity", 1); // aumenta a opacidade
+})
+.on("mouseout", function(event) {
+    // Quando tirar o mouse, volta para o estilo normal
+    svg.selectAll(".mean-salary-line")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("stroke-opacity", 0.5);
+});
 
 }
 function salarioGenderProp() {
@@ -810,8 +830,6 @@ function salarioGenderProp() {
                 .attr("fill", "#1e90ff");
         });
 }
-
-
 
 
 
@@ -2807,7 +2825,6 @@ window.activationFunctions = [
     nivelGenderAbsBar, // index 4
     wordCloud
 ];
-
 
 
 
