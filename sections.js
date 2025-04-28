@@ -446,7 +446,7 @@ function salarioGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset1, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -624,6 +624,13 @@ function salarioGenderProp() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
         });
+
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
 
     // Barras de diferença
     svg.selectAll(".diff-bar")
@@ -848,7 +855,7 @@ function ensinoGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset2, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -1026,6 +1033,13 @@ function ensinoGenderProp() {
             d3.select("#tooltip").style("display", "none");
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
         });
+
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
 
     // Barras de diferença
     svg.selectAll(".diff-bar")
@@ -1373,6 +1387,26 @@ function experienciaGenderAbsBar() {
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
 
+    // Interação nas barras
+    barGroups.selectAll("rect")
+      .on("mouseover", function(event, d) {
+          d3.select("#tooltip")
+              .style("display", "block")
+              .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+          d3.select(this)
+              .attr("fill", "#339999");
+      })
+      .on("mousemove", function(event) {
+          d3.select("#tooltip")
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function(event, d) {
+          d3.select("#tooltip").style("display", "none");
+          d3.select(this)
+              .attr("fill", function(d) { return color(d.key); });
+      });
+
         d3.selectAll(".highlight-experience")
     .on("mouseover", function(event) {
         const experiences = d3.select(this).attr("data-experience").split(",").map(Number); 
@@ -1437,7 +1471,7 @@ function experienciaGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset5, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -1632,7 +1666,14 @@ function experienciaGenderProp() {
                 .attr("r", 4)
                 .attr("fill", "#ff69b4");
         });
-
+    
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
+    
     // Barras de diferença (Feminino - Masculino)
     svg.selectAll(".diff-bar")
         .data(dataset5)
@@ -1898,7 +1939,7 @@ function nivelGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset7, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -2060,6 +2101,13 @@ function nivelGenderProp() {
                 .attr("r", 4)
                 .attr("fill", "#ff69b4");
         });
+
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(4))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
 
     // Barras de diferença (Feminino - Masculino) com animação
     svg.selectAll(".diff-bar")
