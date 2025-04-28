@@ -1133,59 +1133,52 @@ function ensinoGenderProp() {
         });
 }
 
-function ensinoGenderAbsBar() {
-
+function ensinoGenderAbsBar() {    
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
-
     
-
     clean(); // Limpa o SVG
-
+    
     // Escala x para os grupos (categorias de ensino)
     var x = d3.scaleBand()
-      .domain(groups)
-      .range([0, width])
+    .domain(groups)
+    .range([0, width])
       .padding([0.2]);
 
-    // Criação do eixo X com animação
-    svg.append("g")
+      // Criação do eixo X com animação
+      svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .style("opacity", 0)
       .call(d3.axisBottom(x).tickSize(0))
       .transition()
       .duration(800)
       .style("opacity", 1);
-
       
-
-    // Escala Y
-    var y = d3.scaleLinear()
+      // Escala Y
+      var y = d3.scaleLinear()
       .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
       .nice()
       .range([height, 0]);
-
-    // Criação do eixo Y com animação
-    svg.append("g")
+      
+      // Criação do eixo Y com animação
+      svg.append("g")
       .style("opacity", 0)
       .call(d3.axisLeft(y))
       .transition()
       .duration(800)
       .style("opacity", 1);
-
-    
-
-    // Título do eixo X
-    svg.append("text")
-        .attr("text-anchor", "middle")
-        .attr("x", width / 2)
-        .attr("y", height + 50)
+      
+      // Título do eixo X
+      svg.append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", width / 2)
+      .attr("y", height + 50)
         .attr("font-size", "14px")
         .text("Formação")
         .style("opacity", 0.6);
-
-    // Título do eixo Y
-    svg.append("text")
+        
+        // Título do eixo Y
+        svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -1193,8 +1186,8 @@ function ensinoGenderAbsBar() {
         .attr("font-size", "14px")
         .text("Média salarial")
         .style("opacity", 0.6);
-
-    // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
+        
+        // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
     var xSubgroup = d3.scaleBand()
       .domain(subgroups)
       .range([0, x.bandwidth()])
@@ -1205,8 +1198,11 @@ function ensinoGenderAbsBar() {
       .domain(subgroups)
       .range(["#1e90ff", "#ff69b4"]);
 
+    let growingBarsGroup = svg.append("g")
+    .attr("class", "growing-bars");
+
     // Barras
-    svg.append("g")
+    let growingBars = growingBarsGroup.append("g")
     .selectAll("g")
     // Enter na data = loop grupo por grupo
     .data(dataset3)
@@ -1224,36 +1220,66 @@ function ensinoGenderAbsBar() {
       .transition()
       .duration(1000)
       .attr("y", function(d) { return y(d.value); })
-      .attr("height", function(d) { return height - y(d.value); });
+      .attr("height", function(d) { return height - y(d.value); })
+      .on("end", function(d, i, nodes) {
+        // Só na última barra
+        if (i === nodes.length - 1) {
+            animationDone = true; // Marca como terminado
+        }
+    });
 
-    // Interação nas barras
-    svg.selectAll("g")
-      .selectAll("rect")
-      .on("mouseover", function(event, d) {
-        d3.select("#tooltip")
-            .style("display", "block")
-            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-        d3.select(this).attr("fill", "#339999");
-      })
-      .on("mousemove", function(event) {
-        d3.select("#tooltip")
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mouseout", function(event, d) {
-        d3.select("#tooltip").style("display", "none");
-        d3.select(this).attr("fill", function(d) { return color(d.key); });
-      });
+    setTimeout(() => {
+        // Agora desenha as barras finais para interação
+        svg.append("g")
+            .attr("class", "interactive-bars")
+            .selectAll("g")
+            .data(dataset3)
+            .enter()
+            .append("g")
+              .attr("transform", d => "translate(" + x(d.ensino) + ",0)")
+            .selectAll("rect")
+            .data(d => subgroups.map(key => ({key: key, value: d[key]})))
+            .enter()
+            .append("rect")
+              .attr("x", d => xSubgroup(d.key))
+              .attr("y", d => y(d.value))
+              .attr("width", xSubgroup.bandwidth())
+              .attr("height", d => height - y(d.value))
+              .attr("fill", d => color(d.key))
+              
+            //   Interação nas barras
+            svg.select(".interactive-bars")
+                .selectAll("rect")
+                .on("mouseover", function(event, d) {
+                  d3.select("#tooltip")
+                      .style("display", "block")
+                      .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+                  d3.select(this).attr("fill", "#339999");
+                })
+                .on("mousemove", function(event) {
+                  d3.select("#tooltip")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+                })
+                .on("mouseout", function(event, d) {
+                  d3.select("#tooltip").style("display", "none");
+                  d3.select(this).attr("fill", function(d) { return color(d.key); });
+                });
 
+                growingBarsGroup.remove();
+    
+    }, 1000); // mesmo tempo da animação
 
 
       // Interação no texto destacado
-d3.selectAll(".highlight-education")
-.on("mouseover", function(event) {
+    d3.selectAll(".highlight-education")
+    .on("mouseover", function(event) {
+
+    // console.log("passei no check")
     const educations = d3.select(this).attr("data-education").split(",");
 
     // Destaca as barras selecionadas
-    svg.selectAll("g")
+    svg.select(".interactive-bars")
         .selectAll("rect")
         .filter(function(d) {
             return d && d.key && this.parentNode.__data__ && educations.includes(this.parentNode.__data__.ensino.trim());
@@ -1296,7 +1322,6 @@ d3.selectAll(".highlight-education")
 }
 
 function experienciaGenderAbsBar() {
-
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset4.map(d => d.experiencia);
     // console.log(groups);
@@ -1365,7 +1390,9 @@ function experienciaGenderAbsBar() {
       .range(["#1e90ff", "#ff69b4"]);
 
     // Criação das barras
-    const barGroups = svg.append("g")
+    let growingBarsGroup = svg.append("g")
+    .attr("class", "growing-bars");
+    const barGroups = growingBarsGroup.append("g")
       .selectAll("g")
       // Enter na data = loop grupo por grupo
       .data(dataset4)
@@ -1387,25 +1414,51 @@ function experienciaGenderAbsBar() {
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
 
-    // Interação nas barras
-    barGroups.selectAll("rect")
-      .on("mouseover", function(event, d) {
-          d3.select("#tooltip")
-              .style("display", "block")
-              .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-          d3.select(this)
-              .attr("fill", "#339999");
-      })
-      .on("mousemove", function(event) {
-          d3.select("#tooltip")
-              .style("left", (event.pageX + 10) + "px")
-              .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mouseout", function(event, d) {
-          d3.select("#tooltip").style("display", "none");
-          d3.select(this)
-              .attr("fill", function(d) { return color(d.key); });
-      });
+    setTimeout(() => {
+        // Criação das barras
+    const intBar = svg.append("g")
+    .attr("class", "interactive-bars")
+    .selectAll("g")
+    // Enter na data = loop grupo por grupo
+    .data(dataset4)
+    .enter()
+    .append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.experiencia) + ",0)"; });
+
+    intBar.selectAll("rect")
+    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter()
+    .append("rect")
+      .attr("x", function(d) { return xSubgroup(d.key); })
+      .attr("y", y(0)) // começa no chão para animar
+      .attr("width", xSubgroup.bandwidth())
+      .attr("height", 0) // altura inicial 0
+      .attr("fill", function(d) { return color(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+        
+      // Interação nas barras
+      intBar.selectAll("rect")
+        .on("mouseover", function(event, d) {
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+            d3.select(this)
+                .attr("fill", "#339999");
+        })
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this)
+                .attr("fill", function(d) { return color(d.key); });
+        });
+        growingBarsGroup.remove();
+    }, 1000);
+
 
         d3.selectAll(".highlight-experience")
     .on("mouseover", function(event) {
@@ -1814,7 +1867,10 @@ function nivelGenderAbsBar() {
         .call(d3.axisLeft(y));
 
     // Criação das barras
-    svg.append("g")
+    let growingBarsGroup = svg.append("g")
+      .attr("class", "growing-bars");
+
+      let growingBars = growingBarsGroup.append("g")
         .selectAll("g")
         .data(dataset6)
         .enter()
@@ -1840,6 +1896,57 @@ function nivelGenderAbsBar() {
                         .attr("height", d => height - y(d.value));
             });
 
+            setTimeout(() => {
+            // Criação das barras
+            svg.append("g")
+            .attr("class", "interactive-bars")
+            .selectAll("g")
+            .data(dataset6)
+            .enter()
+            .append("g")
+                .attr("transform", d => `translate(${x(d.nivel)},0)`)
+                .each(function(d) {
+                    const nivelAtual = d.nivel; // Salva o nível atual
+                    d3.select(this)
+                        .selectAll("rect")
+                        .data(subgroups.map(key => ({ key: key, value: d[key], nivel: nivelAtual }))) // Passa o nível junto
+                        .enter()
+                        .append("rect")
+                            .attr("x", d => xSubgroup(d.key))
+                            .attr("y", y(0))
+                            .attr("width", xSubgroup.bandwidth())
+                            .attr("height", 0)
+                            .attr("fill", d => color(d.key))
+                            .attr("data-nivel", d => d.nivel) // Adiciona data-nivel no rect
+                            // .ease(d3.easeQuadIn)
+                            .attr("y", d => y(d.value))
+                            .attr("height", d => height - y(d.value));
+                });    
+            
+            // Interação nas barras
+            svg.select(".interactive-bars")
+            .selectAll("rect")
+            .on("mouseover", function(event, d) {
+                d3.select("#tooltip")
+                    .style("display", "block")
+                    .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+                d3.select(this)
+                    .attr("fill", "#339999");
+            })
+            .on("mousemove", function(event) {
+                d3.select("#tooltip")
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+            })
+            .on("mouseout", function(event, d) {
+                d3.select("#tooltip").style("display", "none");
+                d3.select(this)
+                    .attr("fill", d => color(d.key));
+            });
+            growingBarsGroup.remove();
+            
+            }, 800);
+
     // Título do eixo X
     svg.append("text")
         .attr("text-anchor", "middle")
@@ -1858,27 +1965,6 @@ function nivelGenderAbsBar() {
         .attr("font-size", "14px")
         .text("Média salarial")
         .style("opacity", 0.6);
-
-    // Interação nas barras
-    svg.selectAll("g")
-        .selectAll("rect")
-        .on("mouseover", function(event, d) {
-            d3.select("#tooltip")
-                .style("display", "block")
-                .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-            d3.select(this)
-                .attr("fill", "#339999");
-        })
-        .on("mousemove", function(event) {
-            d3.select("#tooltip")
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 20) + "px");
-        })
-        .on("mouseout", function(event, d) {
-            d3.select("#tooltip").style("display", "none");
-            d3.select(this)
-                .attr("fill", d => color(d.key));
-        });
 
     // Highlight no gráfico ao passar o mouse sobre o texto
     d3.selectAll(".highlight-income-jp")
