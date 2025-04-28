@@ -632,13 +632,15 @@ function salarioGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
-    svg.append("text")
-    .attr("x", width / 2) // Centraliza o texto
-    .attr("y", -20)       // Posição vertical (acima do gráfico)
-    .attr("text-anchor", "middle") // Âncora no meio
-    .style("font-size", "15px") // Tamanho da fonte
-    .text("Diferenças entre as proporções");
-
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
     // Barras de diferença
     svg.selectAll(".diff-bar")
         .data(dataset1)
@@ -1048,12 +1050,15 @@ function ensinoGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
+    // Título do eixo Y
     svg.append("text")
-    .attr("x", width / 2) // Centraliza o texto
-    .attr("y", -20)       // Posição vertical (acima do gráfico)
-    .attr("text-anchor", "middle") // Âncora no meio
-    .style("font-size", "15px") // Tamanho da fonte
-    .text("Diferenças entre as proporções");
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -40)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Diferença(%)")
+        .style("opacity", 0.6);
 
     // Barras de diferença
     svg.selectAll(".diff-bar")
@@ -1679,12 +1684,15 @@ function experienciaGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
-    svg.append("text")
-    .attr("x", width / 2) // Centraliza o texto
-    .attr("y", -20)       // Posição vertical (acima do gráfico)
-    .attr("text-anchor", "middle") // Âncora no meio
-    .style("font-size", "15px") // Tamanho da fonte
-    .text("Diferenças entre as proporções");
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
     
     // Barras de diferença (Feminino - Masculino)
     svg.selectAll(".diff-bar")
@@ -2121,12 +2129,15 @@ function nivelGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
-    svg.append("text")
-    .attr("x", width / 2) // Centraliza o texto
-    .attr("y", -20)       // Posição vertical (acima do gráfico)
-    .attr("text-anchor", "middle") // Âncora no meio
-    .style("font-size", "15px") // Tamanho da fonte
-    .text("Diferenças entre as proporções");
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
 
     // Barras de diferença (Feminino - Masculino) com animação
     svg.selectAll(".diff-bar")
