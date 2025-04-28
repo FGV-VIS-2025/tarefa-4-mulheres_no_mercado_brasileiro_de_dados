@@ -2682,199 +2682,377 @@ function wordCloudMan() {
         .text("Geral");
 }
 
-function drawBubbleChart() {
-    expandSVG();
-    clean(); // limpa o svg como em todas as outras funções
+// function drawBubbleChart() {
+//     expandSVG();
+//     clean(); // limpa o svg como em todas as outras funções
 
-    const bubbleData = [
-        {cargo: "Analista Administrativo", genero: "Feminino", salario_medio: 4333.33},
-        {cargo: "Analista Administrativo", genero: "Masculino", salario_medio: 2458.33},
-        {cargo: "Analista de BI", genero: "Feminino", salario_medio: 5738.81},
-        {cargo: "Analista de BI", genero: "Masculino", salario_medio: 6470.26},
-        {cargo: "Analista de Dados", genero: "Feminino", salario_medio: 7286.59},
-        {cargo: "Analista de Dados", genero: "Masculino", salario_medio: 6750.0},
-        {cargo: "Analista de \nInteligência de Mercado", genero: "Feminino", salario_medio: 9600.0},
-        {cargo: "Analista de \nInteligência de Mercado", genero: "Masculino", salario_medio: 5769.23},
-        {cargo: "Analista de Marketing", genero: "Feminino", salario_medio: 4166.67},
-        {cargo: "Analista de Marketing", genero: "Masculino", salario_medio: 4750.0},
-        {cargo: "Analista de Negócios", genero: "Feminino", salario_medio: 5740.0},
-        {cargo: "Analista de Negócios", genero: "Masculino", salario_medio: 7535.21},
-        {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Feminino", salario_medio: 5000.0},
-        {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Masculino", salario_medio: 4884.62},
-        {cargo: "Arquiteto de dados", genero: "Masculino", salario_medio: 12000.0},
-        {cargo: "Cientista de Dados", genero: "Feminino", salario_medio: 7786.76},
-        {cargo: "Cientista de Dados", genero: "Masculino", salario_medio: 9526.41},
-        {cargo: "DBA/Administrador de Banco de Dados", genero: "Feminino", salario_medio: 5000.0},
-        {cargo: "DBA/Administrador de Banco de Dados", genero: "Masculino", salario_medio: 7458.33},
-        {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Feminino", salario_medio: 8576.92},
-        {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Masculino", salario_medio: 8506.58},
-        {cargo: "Engenheiro de Dados", genero: "Feminino", salario_medio: 7650.0},
-        {cargo: "Engenheiro de Dados", genero: "Masculino", salario_medio: 10457.36},
-        {cargo: "Engenheiro de Machine Learning", genero: "Feminino", salario_medio: 8500.0},
-        {cargo: "Engenheiro de Machine Learning", genero: "Masculino", salario_medio: 10868.42},
-        {cargo: "Estatístico", genero: "Feminino", salario_medio: 8055.56},
-        {cargo: "Estatístico", genero: "Masculino", salario_medio: 11400.0},
-        {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Feminino", salario_medio: 6500.0},
-        {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Masculino", salario_medio: 6793.1},
-        {cargo: "Outro", genero: "Feminino", salario_medio: 7045.45},
-        {cargo: "Outro", genero: "Masculino", salario_medio: 6937.5},
-        {cargo: "Product Manager", genero: "Feminino", salario_medio: 15333.33},
-        {cargo: "Product Manager", genero: "Masculino", salario_medio: 10166.67},
-        {cargo: "Professor", genero: "Feminino", salario_medio: 6000.0},
-        {cargo: "Professor", genero: "Masculino", salario_medio: 6937.5},
-        {cargo: "Suporte Técnico", genero: "Feminino", salario_medio: 3166.67},
-        {cargo: "Suporte Técnico", genero: "Masculino", salario_medio: 2875.0},
-        {cargo: "Técnico", genero: "Feminino", salario_medio: 5000.0},
-        {cargo: "Técnico", genero: "Masculino", salario_medio: 4272.73}
-    ];
+//     const bubbleData = [
+//         {cargo: "Analista Administrativo", genero: "Feminino", salario_medio: 4333.33},
+//         {cargo: "Analista Administrativo", genero: "Masculino", salario_medio: 2458.33},
+//         {cargo: "Analista de BI", genero: "Feminino", salario_medio: 5738.81},
+//         {cargo: "Analista de BI", genero: "Masculino", salario_medio: 6470.26},
+//         {cargo: "Analista de Dados", genero: "Feminino", salario_medio: 7286.59},
+//         {cargo: "Analista de Dados", genero: "Masculino", salario_medio: 6750.0},
+//         {cargo: "Analista de \nInteligência de Mercado", genero: "Feminino", salario_medio: 9600.0},
+//         {cargo: "Analista de \nInteligência de Mercado", genero: "Masculino", salario_medio: 5769.23},
+//         {cargo: "Analista de Marketing", genero: "Feminino", salario_medio: 4166.67},
+//         {cargo: "Analista de Marketing", genero: "Masculino", salario_medio: 4750.0},
+//         {cargo: "Analista de Negócios", genero: "Feminino", salario_medio: 5740.0},
+//         {cargo: "Analista de Negócios", genero: "Masculino", salario_medio: 7535.21},
+//         {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Feminino", salario_medio: 5000.0},
+//         {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Masculino", salario_medio: 4884.62},
+//         {cargo: "Arquiteto de dados", genero: "Masculino", salario_medio: 12000.0},
+//         {cargo: "Cientista de Dados", genero: "Feminino", salario_medio: 7786.76},
+//         {cargo: "Cientista de Dados", genero: "Masculino", salario_medio: 9526.41},
+//         {cargo: "DBA/Administrador de Banco de Dados", genero: "Feminino", salario_medio: 5000.0},
+//         {cargo: "DBA/Administrador de Banco de Dados", genero: "Masculino", salario_medio: 7458.33},
+//         {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Feminino", salario_medio: 8576.92},
+//         {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Masculino", salario_medio: 8506.58},
+//         {cargo: "Engenheiro de Dados", genero: "Feminino", salario_medio: 7650.0},
+//         {cargo: "Engenheiro de Dados", genero: "Masculino", salario_medio: 10457.36},
+//         {cargo: "Engenheiro de Machine Learning", genero: "Feminino", salario_medio: 8500.0},
+//         {cargo: "Engenheiro de Machine Learning", genero: "Masculino", salario_medio: 10868.42},
+//         {cargo: "Estatístico", genero: "Feminino", salario_medio: 8055.56},
+//         {cargo: "Estatístico", genero: "Masculino", salario_medio: 11400.0},
+//         {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Feminino", salario_medio: 6500.0},
+//         {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Masculino", salario_medio: 6793.1},
+//         {cargo: "Outro", genero: "Feminino", salario_medio: 7045.45},
+//         {cargo: "Outro", genero: "Masculino", salario_medio: 6937.5},
+//         {cargo: "Product Manager", genero: "Feminino", salario_medio: 15333.33},
+//         {cargo: "Product Manager", genero: "Masculino", salario_medio: 10166.67},
+//         {cargo: "Professor", genero: "Feminino", salario_medio: 6000.0},
+//         {cargo: "Professor", genero: "Masculino", salario_medio: 6937.5},
+//         {cargo: "Suporte Técnico", genero: "Feminino", salario_medio: 3166.67},
+//         {cargo: "Suporte Técnico", genero: "Masculino", salario_medio: 2875.0},
+//         {cargo: "Técnico", genero: "Feminino", salario_medio: 5000.0},
+//         {cargo: "Técnico", genero: "Masculino", salario_medio: 4272.73}
+//     ];
 
-    const nestedData = {
-        name: "root",
-        children: Array.from(
-          d3.group(bubbleData, d => d.cargo),
-          ([key, values]) => ({
-            name : key,
-            children : values.map(d => ({
-              name  : d.genero,
-              value : d.salario_medio
-            }))
-          })
-        )
-      };
+//     const nestedData = {
+//         name: "root",
+//         children: Array.from(
+//           d3.group(bubbleData, d => d.cargo),
+//           ([key, values]) => ({
+//             name : key,
+//             children : values.map(d => ({
+//               name  : d.genero,
+//               value : d.salario_medio
+//             }))
+//           })
+//         )
+//       };
 
     
 
-    /* ---------- 2. pack ---------- */
-  // use EXACTAMENTE a área interna (já descontadas as margens)
-  const innerWidth  = width  - margin.left - margin.right;
-  const innerHeight = height - margin.top  - margin.bottom;
+//     /* ---------- 2. pack ---------- */
+//   // use EXACTAMENTE a área interna (já descontadas as margens)
+//   const innerWidth  = width  - margin.left - margin.right;
+//   const innerHeight = height - margin.top  - margin.bottom;
 
-  const root = d3.pack()
-      .size([width/2, height/2])
-      .padding(5)
-    (d3.hierarchy(nestedData)
-      .sum(d => Math.pow(d.value, 2))
-      .sort((a, b) => b.value - a.value));
+//   const root = d3.pack()
+//       .size([width/2, height/2])
+//       .padding(5)
+//     (d3.hierarchy(nestedData)
+//       .sum(d => Math.pow(d.value, 2))
+//       .sort((a, b) => b.value - a.value));
 
-  /* ---------- 3. grupo-base com margem padrão ---------- */
-  // se você já tem um grupo-mãe “chartArea” em outras funções, use-o aqui
-  const chartArea = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+//   /* ---------- 3. grupo-base com margem padrão ---------- */
+//   // se você já tem um grupo-mãe “chartArea” em outras funções, use-o aqui
+//   const chartArea = svg.append("g")
+//       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  /* ---------- 4. DESLOCAMENTO para centralizar ---------- */
-  // root.x/y são relativos a innerWidth/innerHeight
-  const offsetX = width / 2;
-  const offsetY = height / 2;
+//   /* ---------- 4. DESLOCAMENTO para centralizar ---------- */
+//   // root.x/y são relativos a innerWidth/innerHeight
+//   const offsetX = width / 2;
+//   const offsetY = height / 2;
 
-  // tudo o que é do bubble chart fica dentro desse grupo
-  const g = chartArea.append("g")
-      .attr("transform", `translate(300,400)`);
-  /* ---------- 4. Bolhas ---------- */
-  const node = g.append("g")
-      .selectAll("circle")
-      .data(root.descendants())
-      .join("circle")
-        .attr("fill", d => {
-          if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
-          return "#F2F1F0";                       // bolhas-pai (cargos)
-        })
-        .attr("stroke", "#999")
-        .attr("stroke-width", 1)
-        .on("mouseover", function () { d3.select(this).attr("stroke", "#000").attr("stroke-width", 2); })
-        .on("mouseout",  function () { d3.select(this).attr("stroke", "#999").attr("stroke-width", 1); })
-        .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()))
-
-
+//   // tudo o que é do bubble chart fica dentro desse grupo
+//   const g = chartArea.append("g")
+//       .attr("transform", `translate(300,400)`);
+//   /* ---------- 4. Bolhas ---------- */
+//   const node = g.append("g")
+//       .selectAll("circle")
+//       .data(root.descendants())
+//       .join("circle")
+//         .attr("fill", d => {
+//           if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
+//           return "#F2F1F0";                       // bolhas-pai (cargos)
+//         })
+//         .attr("stroke", "#999")
+//         .attr("stroke-width", 1)
+//         .on("mouseover", function () { d3.select(this).attr("stroke", "#000").attr("stroke-width", 2); })
+//         .on("mouseout",  function () { d3.select(this).attr("stroke", "#999").attr("stroke-width", 1); })
+//         .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()))
 
 
 
-// const node = g.append("g")
-//     .selectAll("circle")
-//     .data(root.descendants())
-//     .join("circle")
-//     .attr("fill", d => {
-//       if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
-//       return "#F2F1F0";
-//     })
-//     .attr("stroke", "#999")
-//     .attr("stroke-width", 1)
-//     .attr("r", 0) // começa com raio zero!
-//     .attr("transform", d => `translate(${d.x},${d.y})`)
-//     .transition()
-//     .duration(900)
-//     .ease(d3.easeElasticOut.amplitude(1).period(0.9)) // efeito "pulo"
-//     // .ease(d3.easeQuadInOut) 
-//     .attr("r", d => d.r)
+
+
+// // const node = g.append("g")
+// //     .selectAll("circle")
+// //     .data(root.descendants())
+// //     .join("circle")
+// //     .attr("fill", d => {
+// //       if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
+// //       return "#F2F1F0";
+// //     })
+// //     .attr("stroke", "#999")
+// //     .attr("stroke-width", 1)
+// //     .attr("r", 0) // começa com raio zero!
+// //     .attr("transform", d => `translate(${d.x},${d.y})`)
+// //     .transition()
+// //     .duration(900)
+// //     .ease(d3.easeElasticOut.amplitude(1).period(0.9)) // efeito "pulo"
+// //     // .ease(d3.easeQuadInOut) 
+// //     .attr("r", d => d.r)
     
 
 
-  /* ---------- 5. Rótulos ---------- */
-  const label = g.append("g")
-      .style("font", "11px sans-serif")
-      .attr("pointer-events", "none")
-      .attr("text-anchor", "middle")
-    .selectAll("text")
-    .data(root.descendants())
-    .join("text")
-      .style("fill-opacity", d => d.parent === root ? 1 : 0)
-      .style("display",     d => d.parent === root ? "inline" : "none")
-      .text(d => d.data.name);
-
-// const label = g.append("g")
-//     .style("font", "11px sans-serif")
-//     .attr("pointer-events", "none")
-//     .attr("text-anchor", "middle")
+//   /* ---------- 5. Rótulos ---------- */
+//   const label = g.append("g")
+//       .style("font", "11px sans-serif")
+//       .attr("pointer-events", "none")
+//       .attr("text-anchor", "middle")
 //     .selectAll("text")
 //     .data(root.descendants())
 //     .join("text")
-//     .style("fill-opacity", 0) // começa invisível
-//     .style("display", "inline") // deixa sempre visível para animar
-//     .attr("transform", d => `translate(${width + 200},${d.y})`) // COMEÇA fora da tela, igual as bolinhas
-//     .text(d => d.data.name)
-//     .transition()
-//     .duration(300)
-//     .ease(d3.easeQuadInOut) // mesmo estilo do círculo
-//     .attr("transform", d => `translate(${d.x},${d.y})`) // vai para a posição final
-//     .style("fill-opacity", d => d.parent === root ? 1 : 0); // aparece se for filho da raiz
+//       .style("fill-opacity", d => d.parent === root ? 1 : 0)
+//       .style("display",     d => d.parent === root ? "inline" : "none")
+//       .text(d => d.data.name);
+
+// // const label = g.append("g")
+// //     .style("font", "11px sans-serif")
+// //     .attr("pointer-events", "none")
+// //     .attr("text-anchor", "middle")
+// //     .selectAll("text")
+// //     .data(root.descendants())
+// //     .join("text")
+// //     .style("fill-opacity", 0) // começa invisível
+// //     .style("display", "inline") // deixa sempre visível para animar
+// //     .attr("transform", d => `translate(${width + 200},${d.y})`) // COMEÇA fora da tela, igual as bolinhas
+// //     .text(d => d.data.name)
+// //     .transition()
+// //     .duration(300)
+// //     .ease(d3.easeQuadInOut) // mesmo estilo do círculo
+// //     .attr("transform", d => `translate(${d.x},${d.y})`) // vai para a posição final
+// //     .style("fill-opacity", d => d.parent === root ? 1 : 0); // aparece se for filho da raiz
 
 
-  /* ---------- 6. Zoom ---------- */
-  svg.on("click", event => zoom(event, root));
+//   /* ---------- 6. Zoom ---------- */
+//   svg.on("click", event => zoom(event, root));
 
-  let focus = root;
-  let view;
+//   let focus = root;
+//   let view;
 
-  zoomTo([focus.x, focus.y, focus.r * 2]);
+//   zoomTo([focus.x, focus.y, focus.r * 2]);
 
-  function zoomTo(v) {
-    const k = width / v[2];
-    view = v;
+//   function zoomTo(v) {
+//     const k = width / v[2];
+//     view = v;
 
-    label.attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`);
-    node .attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`)
-         .attr("r", d => d.r * k);
-  }
+//     label.attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`);
+//     node .attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`)
+//          .attr("r", d => d.r * k);
+//   }
 
-  function zoom(event, d) {
-    focus = d;
+//   function zoom(event, d) {
+//     focus = d;
 
-    const transition = svg.transition()
-        .duration(event.altKey ? 7500 : 750)
+//     const transition = svg.transition()
+//         .duration(event.altKey ? 7500 : 750)
+//         .tween("zoom", () => {
+//           const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+//           return t => zoomTo(i(t));
+//         });
+
+//     label
+//       .filter(function (d) { return d.parent === focus || this.style.display === "inline"; })
+//       .transition(transition)
+//         .style("font", "12px sans-serif")
+//         .style("fill-opacity", d => d.parent === focus ? 1 : 0)
+//         .on("start", function (d) { if (d.parent === focus) this.style.display = "inline"; })
+//         .on("end",   function (d) { if (d.parent !== focus) this.style.display = "none"; });
+//   }
+// }
+function drawBubbleChart() {
+    expandSVG();
+    clean(); // limpa o svg
+  
+    /* ---------- 0. Dados ---------- */
+    const bubbleData = [
+        { cargo: "Analista Administrativo", genero: "Feminino", salario_medio: 4333.33, salario_min: 2500.0, salario_max: 10000.0, num_mulheres: 6, num_homens: 12 },
+        { cargo: "Analista Administrativo", genero: "Masculino", salario_medio: 2458.33, salario_min: 1500.0, salario_max: 5000.0, num_mulheres: 6, num_homens: 12 },
+        { cargo: "Analista de BI", genero: "Feminino", salario_medio: 5738.81, salario_min: 1500.0, salario_max: 18000.0, num_mulheres: 67, num_homens: 271 },
+        { cargo: "Analista de BI", genero: "Masculino", salario_medio: 6426.20, salario_min: 500.0, salario_max: 35000.0, num_mulheres: 67, num_homens: 271 },
+        { cargo: "Analista de Dados", genero: "Feminino", salario_medio: 7204.82, salario_min: 500.0, salario_max: 35000.0, num_mulheres: 83, num_homens: 241 },
+        { cargo: "Analista de Dados", genero: "Masculino", salario_medio: 6620.33, salario_min: 500.0, salario_max: 27500.0, num_mulheres: 83, num_homens: 241 },
+        { cargo: "Analista de Inteligência de Mercado", genero: "Feminino", salario_medio: 9600.0, salario_min: 3500.0, salario_max: 22500.0, num_mulheres: 5, num_homens: 13 },
+        { cargo: "Analista de Inteligência de Mercado", genero: "Masculino", salario_medio: 5769.23, salario_min: 1500.0, salario_max: 14000.0, num_mulheres: 5, num_homens: 13 },
+        { cargo: "Analista de Marketing", genero: "Feminino", salario_medio: 4166.67, salario_min: 2500.0, salario_max: 5000.0, num_mulheres: 3, num_homens: 10 },
+        { cargo: "Analista de Marketing", genero: "Masculino", salario_medio: 4750.0, salario_min: 1500.0, salario_max: 10000.0, num_mulheres: 3, num_homens: 10 },
+        { cargo: "Analista de Negócios", genero: "Feminino", salario_medio: 5740.0, salario_min: 2500.0, salario_max: 10000.0, num_mulheres: 25, num_homens: 71 },
+        { cargo: "Analista de Negócios", genero: "Masculino", salario_medio: 7535.21, salario_min: 1500.0, salario_max: 27500.0, num_mulheres: 25, num_homens: 71 },
+        { cargo: "Analista de Sistemas/Analista de TI", genero: "Feminino", salario_medio: 5000.0, salario_min: 5000.0, salario_max: 5000.0, num_mulheres: 1, num_homens: 13 },
+        { cargo: "Analista de Sistemas/Analista de TI", genero: "Masculino", salario_medio: 4884.62, salario_min: 1500.0, salario_max: 10000.0, num_mulheres: 1, num_homens: 13 },
+        { cargo: "Arquiteto de Dados", genero: "Masculino", salario_medio: 22000.0, salario_min: 10000.0, salario_max: 45000.0, num_mulheres: 0, num_homens: 7 },
+        { cargo: "Arquiteto de dados", genero: "Masculino", salario_medio: 12000.0, salario_min: 10000.0, salario_max: 14000.0, num_mulheres: 0, num_homens: 2 },
+        { cargo: "Cientista de Dados", genero: "Feminino", salario_medio: 7786.76, salario_min: 1500.0, salario_max: 18000.0, num_mulheres: 68, num_homens: 289 },
+        { cargo: "Cientista de Dados", genero: "Masculino", salario_medio: 9411.76, salario_min: 500.0, salario_max: 45000.0, num_mulheres: 68, num_homens: 289 },
+        { cargo: "DBA/Administrador de Banco de Dados", genero: "Feminino", salario_medio: 5000.0, salario_min: 5000.0, salario_max: 5000.0, num_mulheres: 1, num_homens: 13 },
+        { cargo: "DBA/Administrador de Banco de Dados", genero: "Masculino", salario_medio: 6923.08, salario_min: 500.0, salario_max: 14000.0, num_mulheres: 1, num_homens: 13 },
+        { cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Feminino", salario_medio: 8884.62, salario_min: 1500.0, salario_max: 45000.0, num_mulheres: 13, num_homens: 77 },
+        { cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Masculino", salario_medio: 8454.55, salario_min: 500.0, salario_max: 45000.0, num_mulheres: 13, num_homens: 77 },
+        { cargo: "Engenheiro de Dados", genero: "Feminino", salario_medio: 7650.0, salario_min: 1500.0, salario_max: 35000.0, num_mulheres: 40, num_homens: 259 },
+        { cargo: "Engenheiro de Dados", genero: "Masculino", salario_medio: 10480.69, salario_min: 500.0, salario_max: 45000.0, num_mulheres: 40, num_homens: 259 },
+        { cargo: "Engenheiro de Machine Learning", genero: "Feminino", salario_medio: 7611.11, salario_min: 500.0, salario_max: 14000.0, num_mulheres: 9, num_homens: 39 },
+        { cargo: "Engenheiro de Machine Learning", genero: "Masculino", salario_medio: 10705.13, salario_min: 500.0, salario_max: 45000.0, num_mulheres: 9, num_homens: 39 },
+        { cargo: "Estatístico", genero: "Feminino", salario_medio: 8055.56, salario_min: 1500.0, salario_max: 18000.0, num_mulheres: 9, num_homens: 16 },
+        { cargo: "Estatístico", genero: "Masculino", salario_medio: 10718.75, salario_min: 500.0, salario_max: 27500.0, num_mulheres: 9, num_homens: 16 },
+        { cargo: "Outras Engenharias (não inclui dev)", genero: "Feminino", salario_medio: 6500.0, salario_min: 2500.0, salario_max: 10000.0, num_mulheres: 3, num_homens: 29 },
+        { cargo: "Outras Engenharias (não inclui dev)", genero: "Masculino", salario_medio: 6793.10, salario_min: 1500.0, salario_max: 27500.0, num_mulheres: 3, num_homens: 29 },
+        { cargo: "Outro", genero: "Feminino", salario_medio: 6760.87, salario_min: 500.0, salario_max: 18000.0, num_mulheres: 23, num_homens: 90 },
+        { cargo: "Outro", genero: "Masculino", salario_medio: 6838.89, salario_min: 500.0, salario_max: 45000.0, num_mulheres: 23, num_homens: 90 },
+        { cargo: "Product Manager", genero: "Feminino", salario_medio: 15333.33, salario_min: 14000.0, salario_max: 18000.0, num_mulheres: 3, num_homens: 3 },
+        { cargo: "Product Manager", genero: "Masculino", salario_medio: 10166.67, salario_min: 2500.0, salario_max: 18000.0, num_mulheres: 3, num_homens: 3 },
+        { cargo: "Professor", genero: "Feminino", salario_medio: 6000.0, salario_min: 1500.0, salario_max: 14000.0, num_mulheres: 4, num_homens: 8 },
+        { cargo: "Professor", genero: "Masculino", salario_medio: 6937.5, salario_min: 1500.0, salario_max: 18000.0, num_mulheres: 4, num_homens: 8 },
+        { cargo: "Suporte Técnico", genero: "Feminino", salario_medio: 2500.0, salario_min: 500.0, salario_max: 3500.0, num_mulheres: 4, num_homens: 9 },
+        { cargo: "Suporte Técnico", genero: "Masculino", salario_medio: 2611.11, salario_min: 500.0, salario_max: 5000.0, num_mulheres: 4, num_homens: 9 },
+        { cargo: "Técnico", genero: "Feminino", salario_medio: 5000.0, salario_min: 5000.0, salario_max: 5000.0, num_mulheres: 2, num_homens: 11 },
+        { cargo: "Técnico", genero: "Masculino", salario_medio: 4272.73, salario_min: 2500.0, salario_max: 7000.0, num_mulheres: 2, num_homens: 11 }
+      ];
+      
+  
+    /* ---------- 1. Hierarquia ---------- */
+    const nestedData = {
+      name: "root",
+      children: Array.from(
+        d3.group(bubbleData, d => d.cargo),
+        ([cargo, values]) => ({
+          name: cargo,
+          children: values.map(d => ({
+            cargo: d.cargo,
+            genero: d.genero,
+            name: d.genero,
+            salario_medio: d.salario_medio,
+            salario_min: d.salario_min,
+            salario_max: d.salario_max,
+            num_pessoas: d.genero === "Feminino" ? d.num_mulheres : d.num_homens,
+            value: d.genero === "Feminino" ? d.num_mulheres : d.num_homens
+          }))
+        })
+      )
+    };
+  
+    /* ---------- 2. Pack Layout ---------- */
+    const root = d3.pack()
+        .size([width/2, height/2])
+        .padding(6)
+      (d3.hierarchy(nestedData)
+        .sum(d => d.value)
+        .sort((a, b) => b.value - a.value));
+  
+    /* ---------- 3. Grupo Base ---------- */
+    const chartArea = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+    const g = chartArea.append("g")
+      .attr("transform", `translate(300,400)`); // posição original
+  
+    let focus = root;
+    let view;
+  
+    /* ---------- 4. Cria Bolhas ---------- */
+    const node = g.selectAll("circle")
+      .data(root.descendants())
+      .join("circle")
+        .attr("fill", d => d.children ? "#F2F1F0" : d.data.genero === "Feminino" ? "#F2A0CD" : "lightBlue") // #63B0F2
+        .attr("stroke", "#666")
+        .attr("stroke-width", 1)
+        .on("click", (event, d) => {
+          if (focus !== d) {
+            zoom(event, d);
+            event.stopPropagation();
+          }
+        });
+  
+    /* ---------- 5. Rótulos iniciais ---------- */
+    const label = g.append("g")
+      .attr("pointer-events", "none")
+      .attr("text-anchor", "middle")
+      .style("font", "12.5px Helvetica")
+    //   .style("font-weight", "bold")
+      .selectAll("text")
+      .data(root.descendants())
+      .join("text")
+        .style("fill-opacity", d => d.parent === root ? 1 : 0)
+        .style("display", d => d.parent === root ? "inline" : "none")
+        .text(d => d.data.name);
+  
+    /* ---------- 6. Zoom In/Out ---------- */
+    svg.on("click", e => zoom(e, root));
+  
+    zoomTo([root.x, root.y, root.r * 2]);
+  
+    function zoomTo(v) {
+      const k = width / v[2];
+      view = v;
+  
+      label.attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`);
+      node.attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`)
+          .attr("r", d => d.r * k);
+    }
+  
+    function zoom(event, d) {
+      focus = d;
+  
+      g.selectAll(".bubble-text").remove(); // remove textos anteriores
+  
+      const t = svg.transition()
+        .duration(event.altKey ? 3500 : 750)
         .tween("zoom", () => {
           const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-          return t => zoomTo(i(t));
+          return k => zoomTo(i(k));
         });
-
-    label
-      .filter(function (d) { return d.parent === focus || this.style.display === "inline"; })
-      .transition(transition)
-        .style("font", "12px sans-serif")
-        .style("fill-opacity", d => d.parent === focus ? 1 : 0)
-        .on("start", function (d) { if (d.parent === focus) this.style.display = "inline"; })
-        .on("end",   function (d) { if (d.parent !== focus) this.style.display = "none"; });
+  
+      label
+        .filter(function(e) { return e.parent === focus || this.style.display === "inline"; })
+        .transition(t)
+        .style("fill-opacity", e => e.parent === focus ? 1 : 0)
+        .style("font", "12.5px Helvetica")
+        // .style("font-weight", "bold")
+        .on("start", function(e) { if (e.parent === focus) this.style.display = "inline"; })
+        .on("end", function(e) { if (e.parent !== focus) this.style.display = "none"; });
+  
+      /* Adiciona informações dentro da bolha ao final do zoom */
+      t.on("end", () => {
+        if (!focus.children) {
+          const info = [
+            `${focus.data.cargo}`,
+            `${focus.data.genero}`,
+            `Número de pessoas: ${focus.data.num_pessoas}`,
+            `Média salarial: R$${focus.data.salario_medio.toFixed(2)}`,
+            `Salário Mínimo: R$${focus.data.salario_min.toFixed(2)}`,
+            `Salário Máximo: R$${focus.data.salario_max.toFixed(2)}`
+          ];
+  
+          g.append("g")
+            .attr("class", "bubble-text")
+            .attr("transform", `translate(${(focus.x - view[0]) * (width/view[2])}, ${(focus.y - view[1]) * (width/view[2])})`)
+            .selectAll("text")
+            .data(info)
+            .join("text")
+              .attr("y", (d, i) => (i - info.length/2) * 50)
+              .attr("text-anchor", "middle")
+              .style("font-weight", "bold")
+              .style("font-size", "21px")
+              .style("fill", "black")
+              .text(d => d);
+        }
+      });
+    }
   }
-}
-
+  
 
 window.drawPyr = drawPyr;
 window.salarioGenderProp = salarioGenderProp;
