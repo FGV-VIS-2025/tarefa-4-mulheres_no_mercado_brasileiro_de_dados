@@ -632,6 +632,13 @@ function salarioGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
+    svg.append("text")
+    .attr("x", width / 2) // Centraliza o texto
+    .attr("y", -20)       // Posição vertical (acima do gráfico)
+    .attr("text-anchor", "middle") // Âncora no meio
+    .style("font-size", "15px") // Tamanho da fonte
+    .text("Diferenças entre as proporções");
+
     // Barras de diferença
     svg.selectAll(".diff-bar")
         .data(dataset1)
@@ -1040,6 +1047,13 @@ function ensinoGenderProp() {
     .transition()
     .duration(800)
     .style("opacity", 1);
+
+    svg.append("text")
+    .attr("x", width / 2) // Centraliza o texto
+    .attr("y", -20)       // Posição vertical (acima do gráfico)
+    .attr("text-anchor", "middle") // Âncora no meio
+    .style("font-size", "15px") // Tamanho da fonte
+    .text("Diferenças entre as proporções");
 
     // Barras de diferença
     svg.selectAll(".diff-bar")
@@ -1726,6 +1740,13 @@ function experienciaGenderProp() {
     .transition()
     .duration(800)
     .style("opacity", 1);
+
+    svg.append("text")
+    .attr("x", width / 2) // Centraliza o texto
+    .attr("y", -20)       // Posição vertical (acima do gráfico)
+    .attr("text-anchor", "middle") // Âncora no meio
+    .style("font-size", "15px") // Tamanho da fonte
+    .text("Diferenças entre as proporções");
     
     // Barras de diferença (Feminino - Masculino)
     svg.selectAll(".diff-bar")
@@ -2194,6 +2215,13 @@ function nivelGenderProp() {
     .transition()
     .duration(800)
     .style("opacity", 1);
+
+    svg.append("text")
+    .attr("x", width / 2) // Centraliza o texto
+    .attr("y", -20)       // Posição vertical (acima do gráfico)
+    .attr("text-anchor", "middle") // Âncora no meio
+    .style("font-size", "15px") // Tamanho da fonte
+    .text("Diferenças entre as proporções");
 
     // Barras de diferença (Feminino - Masculino) com animação
     svg.selectAll(".diff-bar")
