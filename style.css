@@ -152,7 +152,7 @@ body {
     /* text-align: center; */
     opacity: 0.3;
     transition: opacity 0.4s ease;
-    max-width: 1700px; /* opcional: mais largura */
+    max-width: 1400px; /* opcional: mais largura */
     margin-left: auto;
     margin-right: auto;
     padding: 0; /* remove padding à esquerda */

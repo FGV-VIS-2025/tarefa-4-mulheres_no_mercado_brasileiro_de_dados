@@ -132,16 +132,33 @@ d3.csv("gender_pyramid.csv").then(data => {
 
 });
 
-
-
-// Cria o SVG
 function initVis() {
     svg = d3.select("#vis")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom + 30)
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .style("width", "100%")
+        .style("height", "auto")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+
+// // Cria o SVG
+// function initVis() {
+//     svg = d3.select("#vis")
+//         .append("svg")
+//         // .attr("width", width + margin.left + margin.right)
+//         // .attr("height", height + margin.top + margin.bottom + 30)
+//         .style("width", "100%")
+//         .style("height", "auto")
+//         .append("g")
+//         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+//     // d3.select("#vis").append("svg")
+//     // .attr("viewBox", "0 0 800 500")
+//     // .attr("preserveAspectRatio", "xMidYMid meet")
+//     // .style("width", "100%")
+//     // .style("height", "auto");
+
 
     // Define escalas compartilhadas
     x = d3.scaleBand()
@@ -169,20 +186,29 @@ function clean() {
     svg.selectAll("*").remove();
 }
 
+// function expandSVG() {
+//     d3.select("#vis svg")
+//         // .transition()
+//         // .duration(500)
+//         .attr("width", width * 2)   // aumenta a largura
+//         .attr("height", height * 2); // aumenta a altura
+// }
+
 function expandSVG() {
+    const newWidth = width * 2;
+    const newHeight = height * 2;
+
     d3.select("#vis svg")
-        // .transition()
-        // .duration(500)
-        .attr("width", width * 2)   // aumenta a largura
-        .attr("height", height * 2); // aumenta a altura
+        .attr("viewBox", `0 0 ${newWidth-650} ${newHeight}`);
 }
 
 function resetSVG() {
     d3.select("#vis svg")
         // .transition()
         // .duration(500)
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom + 30);
+        // .attr("width", width + margin.left + margin.right)
+        // .attr("height", height + margin.top + margin.bottom + 30);
+        .attr("viewBox", `0 0 ${width+100} ${height+100}`);
 }
 
 function drawPyr() {
@@ -2833,7 +2859,7 @@ function drawBubbleChart() {
   
     /* ---------- 2. Pack Layout ---------- */
     const root = d3.pack()
-        .size([width/2, height/2])
+        .size([width*2, height*2])
         .padding(6)
       (d3.hierarchy(nestedData)
         .sum(d => d.value)
@@ -2841,7 +2867,7 @@ function drawBubbleChart() {
   
     /* ---------- 3. Grupo Base ---------- */
     const chartArea = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      .attr("transform", `translate(${margin.left},${margin.top } )`);
   
     const g = chartArea.append("g")
       .attr("transform", `translate(300,400)`); // posição original
@@ -2882,8 +2908,9 @@ function drawBubbleChart() {
 
     // Escala de tamanho da bolha para a legenda
     const sizeScale = d3.scaleSqrt()
-        .domain([1, 300]) // número mínimo e máximo de pessoas que você tem no dataset
-        .range([5, 40]);  // raio mínimo e máximo na legenda
+        .domain([1, 600]) // número mínimo e máximo de pessoas que você tem no dataset
+        .range([5, 80]);  // raio mínimo e máximo na legenda
+
 
     const sizeLegend = svg.append("g")
         .attr("class", "legend-group")
