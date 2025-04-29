@@ -132,16 +132,33 @@ d3.csv("gender_pyramid.csv").then(data => {
 
 });
 
-
-
-// Cria o SVG
 function initVis() {
     svg = d3.select("#vis")
         .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom + 30)
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .style("width", "100%")
+        .style("height", "auto")
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+
+// // Cria o SVG
+// function initVis() {
+//     svg = d3.select("#vis")
+//         .append("svg")
+//         // .attr("width", width + margin.left + margin.right)
+//         // .attr("height", height + margin.top + margin.bottom + 30)
+//         .style("width", "100%")
+//         .style("height", "auto")
+//         .append("g")
+//         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+//     // d3.select("#vis").append("svg")
+//     // .attr("viewBox", "0 0 800 500")
+//     // .attr("preserveAspectRatio", "xMidYMid meet")
+//     // .style("width", "100%")
+//     // .style("height", "auto");
+
 
     // Define escalas compartilhadas
     x = d3.scaleBand()
@@ -169,20 +186,29 @@ function clean() {
     svg.selectAll("*").remove();
 }
 
+// function expandSVG() {
+//     d3.select("#vis svg")
+//         // .transition()
+//         // .duration(500)
+//         .attr("width", width * 2)   // aumenta a largura
+//         .attr("height", height * 2); // aumenta a altura
+// }
+
 function expandSVG() {
+    const newWidth = width * 2;
+    const newHeight = height * 2;
+
     d3.select("#vis svg")
-        // .transition()
-        // .duration(500)
-        .attr("width", width * 2)   // aumenta a largura
-        .attr("height", height * 2); // aumenta a altura
+        .attr("viewBox", `0 0 ${newWidth-650} ${newHeight}`);
 }
 
 function resetSVG() {
     d3.select("#vis svg")
         // .transition()
         // .duration(500)
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom + 30);
+        // .attr("width", width + margin.left + margin.right)
+        // .attr("height", height + margin.top + margin.bottom + 30);
+        .attr("viewBox", `0 0 ${width+100} ${height+100}`);
 }
 
 function drawPyr() {
@@ -446,7 +472,7 @@ function salarioGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset1, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -625,6 +651,22 @@ function salarioGenderProp() {
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
         });
 
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
+
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
     // Barras de diferença
     svg.selectAll(".diff-bar")
         .data(dataset1)
@@ -848,7 +890,7 @@ function ensinoGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset2, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -1027,6 +1069,23 @@ function ensinoGenderProp() {
             d3.select(this).transition().duration(200).attr("r", 4).attr("fill", "#ff69b4");
         });
 
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
+
+    // Título do eixo Y
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -40)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Diferença(%)")
+        .style("opacity", 0.6);
+
     // Barras de diferença
     svg.selectAll(".diff-bar")
         .data(dataset2)
@@ -1063,38 +1122,6 @@ function ensinoGenderProp() {
         });
 
 
-    //     // Adiciona legenda
-    // const legend = svg.append("g")
-    // .attr("class", "legend-group")
-    // .attr("transform", `translate(${width - 25}, ${margin.top -85})`); // Posição da legenda
-
-    // // Rosa - Mulheres
-    // legend.append("circle")
-    //     .attr("cx", 0)
-    //     .attr("cy", 0)
-    //     .attr("r", 8)
-    //     .attr("fill", "#ff69b4" )
-    //     .attr("opacity", 0.5); // mesma cor usada para mulheres
-
-    // legend.append("text")
-    //     .attr("x", 20)
-    //     .attr("y", 5)
-    //     .style("font-size", "13px")
-    //     .text("Mulheres");
-
-    // // Azul - Homens
-    // legend.append("circle")
-    //     .attr("cx", 0)
-    //     .attr("cy", 30)
-    //     .attr("r", 8)
-    //     .attr("fill","#1e90ff")
-    //     .attr("opacity", 0.5); // mesma cor usada para homens
-
-    // legend.append("text")
-    //     .attr("x", 20)
-    //     .attr("y", 35)
-    //     .style("font-size", "13px")
-    //     .text("Homens");
 
 
         // Camada para destacar background
@@ -1151,59 +1178,52 @@ function ensinoGenderProp() {
         });
 }
 
-function ensinoGenderAbsBar() {
-
+function ensinoGenderAbsBar() {    
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
-
     
-
     clean(); // Limpa o SVG
-
+    
     // Escala x para os grupos (categorias de ensino)
     var x = d3.scaleBand()
-      .domain(groups)
-      .range([0, width])
+    .domain(groups)
+    .range([0, width])
       .padding([0.2]);
 
-    // Criação do eixo X com animação
-    svg.append("g")
+      // Criação do eixo X com animação
+      svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .style("opacity", 0)
       .call(d3.axisBottom(x).tickSize(0))
       .transition()
       .duration(800)
       .style("opacity", 1);
-
       
-
-    // Escala Y
-    var y = d3.scaleLinear()
+      // Escala Y
+      var y = d3.scaleLinear()
       .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
       .nice()
       .range([height, 0]);
-
-    // Criação do eixo Y com animação
-    svg.append("g")
+      
+      // Criação do eixo Y com animação
+      svg.append("g")
       .style("opacity", 0)
       .call(d3.axisLeft(y))
       .transition()
       .duration(800)
       .style("opacity", 1);
-
-    
-
-    // Título do eixo X
-    svg.append("text")
-        .attr("text-anchor", "middle")
-        .attr("x", width / 2)
-        .attr("y", height + 50)
+      
+      // Título do eixo X
+      svg.append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", width / 2)
+      .attr("y", height + 50)
         .attr("font-size", "14px")
         .text("Formação")
         .style("opacity", 0.6);
-
-    // Título do eixo Y
-    svg.append("text")
+        
+        // Título do eixo Y
+        svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -1211,8 +1231,8 @@ function ensinoGenderAbsBar() {
         .attr("font-size", "14px")
         .text("Média salarial")
         .style("opacity", 0.6);
-
-    // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
+        
+        // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
     var xSubgroup = d3.scaleBand()
       .domain(subgroups)
       .range([0, x.bandwidth()])
@@ -1263,9 +1283,7 @@ function ensinoGenderAbsBar() {
         d3.select(this).attr("fill", function(d) { return color(d.key); });
       });
 
-
-
-      // Interação no texto destacado
+    // Interação no texto destacado
 d3.selectAll(".highlight-education")
 .on("mouseover", function(event) {
     const educations = d3.select(this).attr("data-education").split(",");
@@ -1405,6 +1423,26 @@ function experienciaGenderAbsBar() {
         .attr("y", function(d) { return y(d.value); })
         .attr("height", function(d) { return height - y(d.value); });
 
+    // Interação nas barras
+    barGroups.selectAll("rect")
+      .on("mouseover", function(event, d) {
+          d3.select("#tooltip")
+              .style("display", "block")
+              .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+          d3.select(this)
+              .attr("fill", "#339999");
+      })
+      .on("mousemove", function(event) {
+          d3.select("#tooltip")
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function(event, d) {
+          d3.select("#tooltip").style("display", "none");
+          d3.select(this)
+              .attr("fill", function(d) { return color(d.key); });
+      });
+
         d3.selectAll(".highlight-experience")
     .on("mouseover", function(event) {
         const experiences = d3.select(this).attr("data-experience").split(",").map(Number); 
@@ -1469,7 +1507,7 @@ function experienciaGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset5, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -1664,7 +1702,24 @@ function experienciaGenderProp() {
                 .attr("r", 4)
                 .attr("fill", "#ff69b4");
         });
+    
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(3))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
 
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
+    
     // Barras de diferença (Feminino - Masculino)
     svg.selectAll(".diff-bar")
         .data(dataset5)
@@ -1930,7 +1985,7 @@ function nivelGenderProp() {
     const yLine = d3.scaleLinear()
         .domain([0, d3.max(dataset7, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
-        .range([height, 110]);
+        .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
         .domain([
@@ -2092,6 +2147,23 @@ function nivelGenderProp() {
                 .attr("r", 4)
                 .attr("fill", "#ff69b4");
         });
+
+    svg.append("g")
+    .style("opacity", 0)
+    .call(d3.axisLeft(yDiff).ticks(4))
+    .transition()
+    .duration(800)
+    .style("opacity", 1);
+
+     // Título do eixo Y
+     svg.append("text")
+     .attr("text-anchor", "middle")
+     .attr("transform", "rotate(-90)")
+     .attr("x", -40)
+     .attr("y", -50)
+     .attr("font-size", "14px")
+     .text("Diferença(%)")
+     .style("opacity", 0.6);
 
     // Barras de diferença (Feminino - Masculino) com animação
     svg.selectAll(".diff-bar")
@@ -2714,198 +2786,7 @@ function wordCloudMan() {
         .text("Geral");
 }
 
-// function drawBubbleChart() {
-//     expandSVG();
-//     clean(); // limpa o svg como em todas as outras funções
 
-//     const bubbleData = [
-//         {cargo: "Analista Administrativo", genero: "Feminino", salario_medio: 4333.33},
-//         {cargo: "Analista Administrativo", genero: "Masculino", salario_medio: 2458.33},
-//         {cargo: "Analista de BI", genero: "Feminino", salario_medio: 5738.81},
-//         {cargo: "Analista de BI", genero: "Masculino", salario_medio: 6470.26},
-//         {cargo: "Analista de Dados", genero: "Feminino", salario_medio: 7286.59},
-//         {cargo: "Analista de Dados", genero: "Masculino", salario_medio: 6750.0},
-//         {cargo: "Analista de \nInteligência de Mercado", genero: "Feminino", salario_medio: 9600.0},
-//         {cargo: "Analista de \nInteligência de Mercado", genero: "Masculino", salario_medio: 5769.23},
-//         {cargo: "Analista de Marketing", genero: "Feminino", salario_medio: 4166.67},
-//         {cargo: "Analista de Marketing", genero: "Masculino", salario_medio: 4750.0},
-//         {cargo: "Analista de Negócios", genero: "Feminino", salario_medio: 5740.0},
-//         {cargo: "Analista de Negócios", genero: "Masculino", salario_medio: 7535.21},
-//         {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Feminino", salario_medio: 5000.0},
-//         {cargo: "Analista de Sistemas/\nAnalista de TI", genero: "Masculino", salario_medio: 4884.62},
-//         {cargo: "Arquiteto de dados", genero: "Masculino", salario_medio: 12000.0},
-//         {cargo: "Cientista de Dados", genero: "Feminino", salario_medio: 7786.76},
-//         {cargo: "Cientista de Dados", genero: "Masculino", salario_medio: 9526.41},
-//         {cargo: "DBA/Administrador de Banco de Dados", genero: "Feminino", salario_medio: 5000.0},
-//         {cargo: "DBA/Administrador de Banco de Dados", genero: "Masculino", salario_medio: 7458.33},
-//         {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Feminino", salario_medio: 8576.92},
-//         {cargo: "Desenvolvedor ou Engenheiro de Software", genero: "Masculino", salario_medio: 8506.58},
-//         {cargo: "Engenheiro de Dados", genero: "Feminino", salario_medio: 7650.0},
-//         {cargo: "Engenheiro de Dados", genero: "Masculino", salario_medio: 10457.36},
-//         {cargo: "Engenheiro de Machine Learning", genero: "Feminino", salario_medio: 8500.0},
-//         {cargo: "Engenheiro de Machine Learning", genero: "Masculino", salario_medio: 10868.42},
-//         {cargo: "Estatístico", genero: "Feminino", salario_medio: 8055.56},
-//         {cargo: "Estatístico", genero: "Masculino", salario_medio: 11400.0},
-//         {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Feminino", salario_medio: 6500.0},
-//         {cargo: "Outras Engenharias \n(não inclui dev)", genero: "Masculino", salario_medio: 6793.1},
-//         {cargo: "Outro", genero: "Feminino", salario_medio: 7045.45},
-//         {cargo: "Outro", genero: "Masculino", salario_medio: 6937.5},
-//         {cargo: "Product Manager", genero: "Feminino", salario_medio: 15333.33},
-//         {cargo: "Product Manager", genero: "Masculino", salario_medio: 10166.67},
-//         {cargo: "Professor", genero: "Feminino", salario_medio: 6000.0},
-//         {cargo: "Professor", genero: "Masculino", salario_medio: 6937.5},
-//         {cargo: "Suporte Técnico", genero: "Feminino", salario_medio: 3166.67},
-//         {cargo: "Suporte Técnico", genero: "Masculino", salario_medio: 2875.0},
-//         {cargo: "Técnico", genero: "Feminino", salario_medio: 5000.0},
-//         {cargo: "Técnico", genero: "Masculino", salario_medio: 4272.73}
-//     ];
-
-//     const nestedData = {
-//         name: "root",
-//         children: Array.from(
-//           d3.group(bubbleData, d => d.cargo),
-//           ([key, values]) => ({
-//             name : key,
-//             children : values.map(d => ({
-//               name  : d.genero,
-//               value : d.salario_medio
-//             }))
-//           })
-//         )
-//       };
-
-    
-
-//     /* ---------- 2. pack ---------- */
-//   // use EXACTAMENTE a área interna (já descontadas as margens)
-//   const innerWidth  = width  - margin.left - margin.right;
-//   const innerHeight = height - margin.top  - margin.bottom;
-
-//   const root = d3.pack()
-//       .size([width/2, height/2])
-//       .padding(5)
-//     (d3.hierarchy(nestedData)
-//       .sum(d => Math.pow(d.value, 2))
-//       .sort((a, b) => b.value - a.value));
-
-//   /* ---------- 3. grupo-base com margem padrão ---------- */
-//   // se você já tem um grupo-mãe “chartArea” em outras funções, use-o aqui
-//   const chartArea = svg.append("g")
-//       .attr("transform", `translate(${margin.left},${margin.top})`);
-
-//   /* ---------- 4. DESLOCAMENTO para centralizar ---------- */
-//   // root.x/y são relativos a innerWidth/innerHeight
-//   const offsetX = width / 2;
-//   const offsetY = height / 2;
-
-//   // tudo o que é do bubble chart fica dentro desse grupo
-//   const g = chartArea.append("g")
-//       .attr("transform", `translate(300,400)`);
-//   /* ---------- 4. Bolhas ---------- */
-//   const node = g.append("g")
-//       .selectAll("circle")
-//       .data(root.descendants())
-//       .join("circle")
-//         .attr("fill", d => {
-//           if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
-//           return "#F2F1F0";                       // bolhas-pai (cargos)
-//         })
-//         .attr("stroke", "#999")
-//         .attr("stroke-width", 1)
-//         .on("mouseover", function () { d3.select(this).attr("stroke", "#000").attr("stroke-width", 2); })
-//         .on("mouseout",  function () { d3.select(this).attr("stroke", "#999").attr("stroke-width", 1); })
-//         .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()))
-
-
-
-
-
-// // const node = g.append("g")
-// //     .selectAll("circle")
-// //     .data(root.descendants())
-// //     .join("circle")
-// //     .attr("fill", d => {
-// //       if (!d.children) return d.data.name === "Feminino" ? "pink" : "lightblue";
-// //       return "#F2F1F0";
-// //     })
-// //     .attr("stroke", "#999")
-// //     .attr("stroke-width", 1)
-// //     .attr("r", 0) // começa com raio zero!
-// //     .attr("transform", d => `translate(${d.x},${d.y})`)
-// //     .transition()
-// //     .duration(900)
-// //     .ease(d3.easeElasticOut.amplitude(1).period(0.9)) // efeito "pulo"
-// //     // .ease(d3.easeQuadInOut) 
-// //     .attr("r", d => d.r)
-    
-
-
-//   /* ---------- 5. Rótulos ---------- */
-//   const label = g.append("g")
-//       .style("font", "11px sans-serif")
-//       .attr("pointer-events", "none")
-//       .attr("text-anchor", "middle")
-//     .selectAll("text")
-//     .data(root.descendants())
-//     .join("text")
-//       .style("fill-opacity", d => d.parent === root ? 1 : 0)
-//       .style("display",     d => d.parent === root ? "inline" : "none")
-//       .text(d => d.data.name);
-
-// // const label = g.append("g")
-// //     .style("font", "11px sans-serif")
-// //     .attr("pointer-events", "none")
-// //     .attr("text-anchor", "middle")
-// //     .selectAll("text")
-// //     .data(root.descendants())
-// //     .join("text")
-// //     .style("fill-opacity", 0) // começa invisível
-// //     .style("display", "inline") // deixa sempre visível para animar
-// //     .attr("transform", d => `translate(${width + 200},${d.y})`) // COMEÇA fora da tela, igual as bolinhas
-// //     .text(d => d.data.name)
-// //     .transition()
-// //     .duration(300)
-// //     .ease(d3.easeQuadInOut) // mesmo estilo do círculo
-// //     .attr("transform", d => `translate(${d.x},${d.y})`) // vai para a posição final
-// //     .style("fill-opacity", d => d.parent === root ? 1 : 0); // aparece se for filho da raiz
-
-
-//   /* ---------- 6. Zoom ---------- */
-//   svg.on("click", event => zoom(event, root));
-
-//   let focus = root;
-//   let view;
-
-//   zoomTo([focus.x, focus.y, focus.r * 2]);
-
-//   function zoomTo(v) {
-//     const k = width / v[2];
-//     view = v;
-
-//     label.attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`);
-//     node .attr("transform", d => `translate(${(d.x - v[0]) * k}, ${(d.y - v[1]) * k})`)
-//          .attr("r", d => d.r * k);
-//   }
-
-//   function zoom(event, d) {
-//     focus = d;
-
-//     const transition = svg.transition()
-//         .duration(event.altKey ? 7500 : 750)
-//         .tween("zoom", () => {
-//           const i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-//           return t => zoomTo(i(t));
-//         });
-
-//     label
-//       .filter(function (d) { return d.parent === focus || this.style.display === "inline"; })
-//       .transition(transition)
-//         .style("font", "12px sans-serif")
-//         .style("fill-opacity", d => d.parent === focus ? 1 : 0)
-//         .on("start", function (d) { if (d.parent === focus) this.style.display = "inline"; })
-//         .on("end",   function (d) { if (d.parent !== focus) this.style.display = "none"; });
-//   }
-// }
 function drawBubbleChart() {
     expandSVG();
     clean(); // limpa o svg
@@ -2978,7 +2859,7 @@ function drawBubbleChart() {
   
     /* ---------- 2. Pack Layout ---------- */
     const root = d3.pack()
-        .size([width/2, height/2])
+        .size([width*2, height*2])
         .padding(6)
       (d3.hierarchy(nestedData)
         .sum(d => d.value)
@@ -2986,7 +2867,7 @@ function drawBubbleChart() {
   
     /* ---------- 3. Grupo Base ---------- */
     const chartArea = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      .attr("transform", `translate(${margin.left},${margin.top } )`);
   
     const g = chartArea.append("g")
       .attr("transform", `translate(300,400)`); // posição original
@@ -3027,8 +2908,9 @@ function drawBubbleChart() {
 
     // Escala de tamanho da bolha para a legenda
     const sizeScale = d3.scaleSqrt()
-        .domain([1, 300]) // número mínimo e máximo de pessoas que você tem no dataset
-        .range([5, 40]);  // raio mínimo e máximo na legenda
+        .domain([1, 600]) // número mínimo e máximo de pessoas que você tem no dataset
+        .range([5, 80]);  // raio mínimo e máximo na legenda
+
 
     const sizeLegend = svg.append("g")
         .attr("class", "legend-group")
@@ -3186,6 +3068,8 @@ function drawBubbleChart() {
 function vazio(){
     clean();
 }
+  
+
 window.drawPyr = drawPyr;
 window.salarioGenderProp = salarioGenderProp;
 window.activationFunctions = [
@@ -3198,7 +3082,8 @@ window.activationFunctions = [
     experienciaGenderAbsBar,
     nivelGenderProp, 
     nivelGenderAbsBar, // index 4
-    wordCloud, vazio
+    wordCloud, 
+    vazio
 ];
 
 
