@@ -2290,7 +2290,7 @@ function wordCloud() {
         .style("text-anchor", "middle");
 
     const g = svg.append("g")
-        .attr("transform", `translate(${width/2},${height/2})`);
+        .attr("transform", `translate(${width/2},${height/2 +120})`);
 
     const layout = d3.layout.cloud()
         .size([width, height])
@@ -2366,7 +2366,7 @@ function wordCloud() {
 
     const legend = svg.append("g")
         .attr("class", "legend-buttons")
-        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+        .attr("transform", `translate(${width - 150}, 100)`); // posição no canto superior direito
 
     // Botão para Homens
     legend.append("rect")
@@ -2462,7 +2462,7 @@ function wordCloudWoman() {
     .style("text-anchor", "middle")
 
     const g = svg.append("g")
-                .attr("transform", `translate(${width/2},${height/2})`);
+                .attr("transform", `translate(${width/2},${height/2+120})`);
 
     const layout = d3.layout.cloud()
         .size([width, height])
@@ -2539,7 +2539,7 @@ function wordCloudWoman() {
 
     const legend = svg.append("g")
         .attr("class", "legend-buttons")
-        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+        .attr("transform", `translate(${width - 150}, 100)`); // posição no canto superior direito
 
     // Botão para Homens
     legend.append("rect")
@@ -2634,7 +2634,7 @@ function wordCloudMan() {
     .style("text-anchor", "middle")
 
     const g = svg.append("g")
-                .attr("transform", `translate(${width/2},${height/2})`);
+                .attr("transform", `translate(${width/2},${height/2 +120})`);
 
     const layout = d3.layout.cloud()
         .size([width, height])
@@ -2711,7 +2711,7 @@ function wordCloudMan() {
 
     const legend = svg.append("g")
         .attr("class", "legend-buttons")
-        .attr("transform", `translate(${width - 150}, 20)`); // posição no canto superior direito
+        .attr("transform", `translate(${width - 150}, 100)`); // posição no canto superior direito
 
     // Botão para Homens
     legend.append("rect")
