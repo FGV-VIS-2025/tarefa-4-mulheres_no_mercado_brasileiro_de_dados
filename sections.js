@@ -1494,6 +1494,9 @@ function experienciaGenderAbsBar() {
 function experienciaGenderProp() {
     clean(); 
 
+    // Adicionando uma classe única para este gráfico
+    const chartGroup = svg.append("g").attr("class", "experiencia-gender-chart");
+
     const x = d3.scaleBand()
         .domain(dataset5.map(d => d.experiencia))
         .range([0, width])
@@ -1510,15 +1513,12 @@ function experienciaGenderProp() {
         .range([height, 130]);
 
     const yDiff = d3.scaleLinear()
-        .domain([
-            d3.min(dataset5, d => d.Feminino - d.Masculino),
-            d3.max(dataset5, d => d.Feminino - d.Masculino)
-        ])
+        .domain([d3.min(dataset5, d => d.Feminino - d.Masculino), d3.max(dataset5, d => d.Feminino - d.Masculino)])
         .nice()
-        .range([height-400, 0]);
+        .range([height - 400, 0]);
 
     // Eixos
-    svg.append("g")
+    chartGroup.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
         .call(d3.axisBottom(x))
@@ -1526,15 +1526,15 @@ function experienciaGenderProp() {
         .duration(800)
         .style("opacity", 1);
 
-    svg.append("g")
+    chartGroup.append("g")
         .style("opacity", 0)
         .call(d3.axisLeft(yLine))
         .transition()
         .duration(800)
         .style("opacity", 1);
 
-    // Título do eixo X
-    svg.append("text")
+    // Títulos
+    chartGroup.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
         .attr("y", height + 40)
@@ -1542,8 +1542,7 @@ function experienciaGenderProp() {
         .text("Tempo de experiência (anos)")
         .style("opacity", 0.6);
 
-    // Título do eixo Y
-    svg.append("text")
+    chartGroup.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -1562,7 +1561,7 @@ function experienciaGenderProp() {
         .y(d => yLine(d.Feminino));
 
     // Linha Masculino
-    svg.append("path")
+    chartGroup.append("path")
         .datum(dataset5)
         .attr("d", lineMasculino)
         .attr("stroke", "#1e90ff")
@@ -1592,7 +1591,7 @@ function experienciaGenderProp() {
         .attr("stroke-dashoffset", 0);
 
     // Linha Feminino
-    svg.append("path")
+    chartGroup.append("path")
         .datum(dataset5)
         .attr("d", lineFeminino)
         .attr("stroke", "#ff69b4")
@@ -1622,7 +1621,7 @@ function experienciaGenderProp() {
         .attr("stroke-dashoffset", 0);
 
     // Pontos nas linhas - masculino
-    svg.selectAll(".circle-male")
+    chartGroup.selectAll(".circle-male")
         .data(dataset5)
         .enter()
         .append("circle")
@@ -1637,7 +1636,7 @@ function experienciaGenderProp() {
         .attr("r", 4);
 
     // Pontos nas linhas - feminino
-    svg.selectAll(".circle-female")
+    chartGroup.selectAll(".circle-female")
         .data(dataset5)
         .enter()
         .append("circle")
@@ -1652,7 +1651,7 @@ function experienciaGenderProp() {
         .attr("r", 4);
 
     // Tooltip dos pontos - masculino
-    svg.selectAll(".circle-male")
+    chartGroup.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
@@ -1678,7 +1677,7 @@ function experienciaGenderProp() {
         });
 
     // Tooltip dos pontos - feminino
-    svg.selectAll(".circle-female")
+    chartGroup.selectAll(".circle-female")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
@@ -1702,26 +1701,26 @@ function experienciaGenderProp() {
                 .attr("r", 4)
                 .attr("fill", "#ff69b4");
         });
-    
-    svg.append("g")
-    .style("opacity", 0)
-    .call(d3.axisLeft(yDiff).ticks(3))
-    .transition()
-    .duration(800)
-    .style("opacity", 1);
 
-     // Título do eixo Y
-     svg.append("text")
-     .attr("text-anchor", "middle")
-     .attr("transform", "rotate(-90)")
-     .attr("x", -40)
-     .attr("y", -50)
-     .attr("font-size", "14px")
-     .text("Diferença(%)")
-     .style("opacity", 0.6);
-    
+    chartGroup.append("g")
+        .style("opacity", 0)
+        .call(d3.axisLeft(yDiff).ticks(3))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
+
+    // Título do eixo Y
+    chartGroup.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -40)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Diferença(%)")
+        .style("opacity", 0.6);
+
     // Barras de diferença (Feminino - Masculino)
-    svg.selectAll(".diff-bar")
+    chartGroup.selectAll(".diff-bar")
         .data(dataset5)
         .enter()
         .append("rect")
@@ -1740,7 +1739,7 @@ function experienciaGenderProp() {
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
 
     // Tooltip nas barras de diferença
-    svg.selectAll(".diff-bar")
+    chartGroup.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
                 .style("display", "block")
@@ -1759,54 +1758,54 @@ function experienciaGenderProp() {
                 .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 
-        // Adiciona camada de fundo para destaque antes das barras
-const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+    // Adiciona camada de fundo para destaque antes das barras
+    const backgroundHighlight = chartGroup.append("g").attr("class", "background-highlight");
 
-// Interação no texto destacado
-d3.selectAll(".highlight-experience")
-  .on("mouseover", function(event) {
-    const experiences = d3.select(this).attr("data-experience").split(",").map(Number);
+    // Interação no texto destacado
+    d3.selectAll(".highlight-experience")
+        .on("mouseover", function(event) {
+            const experiences = d3.select(this).attr("data-experience").split(",").map(Number);
 
-    const gruposSelecionados = dataset4.filter(d => 
-      experiences.includes(Number(d.experiencia))
-    );
+            const gruposSelecionados = dataset4.filter(d => 
+                experiences.includes(Number(d.experiencia))
+            );
 
-    if (gruposSelecionados.length === 0) return;
+            if (gruposSelecionados.length === 0) return;
 
-    const primeiraFaixa = gruposSelecionados[0].experiencia;
-    const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].experiencia;
+            const primeiraFaixa = gruposSelecionados[0].experiencia;
+            const ultimaFaixa = gruposSelecionados[gruposSelecionados.length - 1].experiencia;
 
-    const xInicio = x(primeiraFaixa);
-    const xFim = x(ultimaFaixa) + x.bandwidth();
+            const xInicio = x(primeiraFaixa);
+            const xFim = x(ultimaFaixa) + x.bandwidth();
 
-    backgroundHighlight.selectAll("rect").remove();
+            backgroundHighlight.selectAll("rect").remove();
 
-    backgroundHighlight.append("rect")
-      .attr("x", xInicio)
-      .attr("y", 0)
-      .attr("width", xFim - xInicio)
-      .attr("height", height)
-      .attr("fill", "#e0e0e0")
-      .attr("opacity", 0.4);
+            backgroundHighlight.append("rect")
+                .attr("x", xInicio)
+                .attr("y", 0)
+                .attr("width", xFim - xInicio)
+                .attr("height", height)
+                .attr("fill", "#e0e0e0")
+                .attr("opacity", 0.4);
 
-    svg.selectAll("g")
-      .selectAll("rect")
-      .filter(function(d) {
-        return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
-      })
-      .transition()
-      .duration(200)
-      .attr("fill", "#c8c8c8");
-  })
-  .on("mouseout", function(event) {
-    backgroundHighlight.selectAll("rect").remove();
+            chartGroup.selectAll("g")
+                .selectAll("rect")
+                .filter(function(d) {
+                    return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
+                })
+                .transition()
+                .duration(200)
+                .attr("fill", "#c8c8c8");
+        })
+        .on("mouseout", function(event) {
+            backgroundHighlight.selectAll("rect").remove();
 
-    svg.selectAll("g")
-      .selectAll("rect")
-      .transition()
-      .duration(200)
-      .attr("fill", d => d ? color(d.key) : null);
-  });
+            chartGroup.selectAll("g")
+                .selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("fill", d => d ? color(d.key) : null);
+        });
 }
 
 function nivelGenderAbsBar() {
