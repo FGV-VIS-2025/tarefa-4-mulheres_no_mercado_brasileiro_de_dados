@@ -2864,6 +2864,8 @@ function drawBubbleChart() {
       (d3.hierarchy(nestedData)
         .sum(d => d.value)
         .sort((a, b) => b.value - a.value));
+
+    
   
     /* ---------- 3. Grupo Base ---------- */
     const chartArea = svg.append("g")
@@ -2955,6 +2957,27 @@ function drawBubbleChart() {
       .join("circle")
         .attr("fill", d => d.children ? "#F2F1F0" : d.data.genero === "Feminino" ? "#F2A0CD" : "lightBlue") // #63B0F2
         .attr("stroke", "#666")
+        // .on("mouseover", function() { d3.select(this).attr("stroke", "#000").attr("stroke-width", 2); })
+        .on("mouseover", function(event, d) {
+            d3.select(this)
+              .attr("stroke", "#000")
+              .attr("stroke-width", 2);
+          
+            d3.select(".label-" + d.data.name.replace(/\s+/g, "-"))
+              .style("font-weight", "bold");
+          })
+          
+        // .on("mouseout", function() { d3.select(this).attr("stroke", "#666").attr("stroke-width", 1); })
+        .on("mouseout", function(event, d) {
+            d3.select(this)
+              .attr("stroke", "#666")
+              .attr("stroke-width", 1);
+          
+            d3.select(".label-" + d.data.name.replace(/\s+/g, "-"))
+              .style("font-weight", "normal");
+          })
+          
+        .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()))
         .attr("stroke-width", 1)
         .on("click", (event, d) => {
           if (focus !== d) {
@@ -2962,6 +2985,7 @@ function drawBubbleChart() {
             event.stopPropagation();
           }
         });
+
   
     /* ---------- 5. Rótulos iniciais ---------- */
     const label = g.append("g")
@@ -2972,6 +2996,7 @@ function drawBubbleChart() {
       .selectAll("text")
       .data(root.descendants())
       .join("text")
+        .attr("class", d => "label-" + d.data.name.replace(/\s+/g, "-"))
         .style("fill-opacity", d => d.parent === root ? 1 : 0)
         .style("display", d => d.parent === root ? "inline" : "none")
         .text(d => d.data.name);
