@@ -1358,6 +1358,10 @@ function experienciaGenderAbsBar() {
 
     clean(); // Limpa o SVG
 
+    let animationDone = false;
+    let finishedTransitions = 0;
+    const totalTransitions = dataset4.length * subgroups.length;
+
     // Escala x para os grupos (categorias de experiência)
     var x = d3.scaleBand()
       .domain(groups)
@@ -1453,7 +1457,13 @@ function experienciaGenderAbsBar() {
       .transition()
       .duration(1000)
         .attr("y", function(d) { return y(d.value); })
-        .attr("height", function(d) { return height - y(d.value); });
+        .attr("height", function(d) { return height - y(d.value); })
+        .on("end", () => {
+            finishedTransitions++;
+            if (finishedTransitions === totalTransitions) {
+                animationDone = true;
+            }
+        });
 
     // Interação nas barras
     barGroups.selectAll("rect")
@@ -1475,49 +1485,48 @@ function experienciaGenderAbsBar() {
               .attr("fill", function(d) { return color(d.key); });
       });
 
-        d3.selectAll(".highlight-experience")
-    .on("mouseover", function(event) {
-        const experiences = d3.select(this).attr("data-experience").split(",").map(Number); 
+      d3.selectAll(".highlight-experience")
+      .on("mouseover", function(event) {
+          if (!animationDone) return;
 
-        // Destaca as barras selecionadas
-        svg.selectAll("g")
-            .selectAll("rect")
-            .filter(function(d) {
-                return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
-            })
-            .transition()
-            .duration(200)
-            .attr("opacity", 1) // Opacidade total para as barras destacadas
-            .attr("stroke", "black") // Aplica borda preta
-            .attr("stroke-width", 2); // Define a largura da borda
+          const experiences = d3.select(this).attr("data-experience")
+              .split(",").map(Number);
 
-        // Esbranquece as barras não selecionadas
-        svg.selectAll("g")
-            .selectAll("rect")
-            .filter(function(d) {
-                return d && d.key && this.parentNode.__data__ && !experiences.includes(Number(this.parentNode.__data__.experiencia));
-            })
-            .transition()
-            .duration(200)
-            .attr("opacity", 0.2) // Diminui a opacidade para as barras não selecionadas
-            .attr("fill", "#d3d3d3") // Muda a cor para um tom de cinza para esbranquiçar
-            .attr("stroke", "none") // Remove borda
-            .attr("stroke-width", 0); // Remove a largura da borda
-    })
-    .on("mouseout", function(event) {
-        // Remove o fundo de destaque
-        svg.select("g.background-highlight").selectAll("rect").remove();
+          svg.selectAll("g")
+              .selectAll("rect")
+              .filter(function(d) {
+                  return d && d.key && this.parentNode.__data__ && experiences.includes(Number(this.parentNode.__data__.experiencia));
+              })
+              .transition()
+              .duration(200)
+              .attr("opacity", 1)
+              .attr("stroke", "black")
+              .attr("stroke-width", 2);
 
-        // Restaura todas as barras ao estado original
-        svg.selectAll("g")
-            .selectAll("rect")
-            .transition()
-            .duration(200)
-            .attr("opacity", 1) // Restaura a opacidade para todas as barras
-            .attr("fill", function(d) { return color(d.key); }) // Restaura a cor original
-            .attr("stroke", "none") // Remove borda
-            .attr("stroke-width", 0); // Remove a largura da borda
-    });
+          svg.selectAll("g")
+              .selectAll("rect")
+              .filter(function(d) {
+                  return d && d.key && this.parentNode.__data__ && !experiences.includes(Number(this.parentNode.__data__.experiencia));
+              })
+              .transition()
+              .duration(200)
+              .attr("opacity", 0.2)
+              .attr("fill", "#d3d3d3")
+              .attr("stroke", "none")
+              .attr("stroke-width", 0);
+      })
+      .on("mouseout", function(event) {
+          if (!animationDone) return;
+
+          svg.selectAll("g")
+              .selectAll("rect")
+              .transition()
+              .duration(200)
+              .attr("opacity", 1)
+              .attr("fill", function(d) { return color(d.key); })
+              .attr("stroke", "none")
+              .attr("stroke-width", 0);
+      });
 
       
       
