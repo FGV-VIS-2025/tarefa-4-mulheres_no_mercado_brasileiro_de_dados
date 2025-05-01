@@ -3069,23 +3069,18 @@ function drawBubbleChart() {
         .attr("cy", 0)
         .attr("r", 8)
         .attr("fill", "#F2A0CD"); // mesma cor usada para mulheres
-
-        
-
     legend.append("text")
         .attr("class", "highlight-legend")
         .attr("x", 40)
         .attr("y", 2)
         .style("font-size", "13px")
         .text("Mulheres");
-
     // Azul - Homens
     legend.append("circle")
         .attr("cx", 0)
         .attr("cy", 30)
         .attr("r", 8)
         .attr("fill", "lightblue"); // mesma cor usada para homens
-
     legend.append("text")
         .attr("class", "highlight-legend")
         .attr("x", 38)
@@ -3098,7 +3093,6 @@ function drawBubbleChart() {
     const sizeScale = d3.scaleSqrt()
         .domain([1, 600]) // número mínimo e máximo de pessoas que você tem no dataset
         .range([5, 80]);  // raio mínimo e máximo na legenda
-
 
     const sizeLegend = svg.append("g")
         .attr("class", "legend-group")
@@ -3136,6 +3130,8 @@ function drawBubbleChart() {
   
     let focus = root;
     let view;
+    let currentFocusDepth = 0;
+
   
     /* ---------- 4. Cria Bolhas ---------- */
     const node = g.selectAll("circle")
@@ -3154,7 +3150,24 @@ function drawBubbleChart() {
           
             d3.select(".label-" + d.data.name.replace(/\s+/g, "-"))
               .style("font-weight", "bold");
+            d3.select("#tooltip")
+            //   .style("display", e => {return d === root ? "none" : "block";})
+            .style("display", currentFocusDepth < 1 && d.depth === 2 ? "block" : "none")
+
+              .html(`
+                  <strong>Cargo:</strong> ${d.data.cargo}<br>
+                  <strong>Gênero:</strong> ${d.data.genero}<br>
+                  <strong>Salário médio:</strong> R$ ${d.data.salario_medio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}<br>
+                  <strong>Intervalo:</strong> R$ ${d.data.salario_min.toLocaleString("pt-BR")} - R$ ${d.data.salario_max.toLocaleString("pt-BR")}<br>
+                  <strong>Qtd. pessoas:</strong> ${d.data.num_pessoas}
+              `);
           })
+
+        .on("mousemove", function(event) {
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
           
         // .on("mouseout", function() { d3.select(this).attr("stroke", "#666").attr("stroke-width", 1); })
         .on("mouseout", function(event, d) {
@@ -3164,16 +3177,18 @@ function drawBubbleChart() {
           
             d3.select(".label-" + d.data.name.replace(/\s+/g, "-"))
               .style("font-weight", "normal");
+            d3.select("#tooltip").style("display", "none");
           })
           
         .on("click", (event, d) => focus !== d && (zoom(event, d), event.stopPropagation()))
-        .attr("stroke-width", 1)
+            .attr("stroke-width", 1)
+
         .on("click", (event, d) => {
-          if (focus !== d) {
-            zoom(event, d);
-            event.stopPropagation();
-          }
-        });
+            if (focus !== d) {
+                zoom(event, d);
+                event.stopPropagation();
+            }
+            });
 
   
     /* ---------- 5. Rótulos iniciais ---------- */
@@ -3206,6 +3221,7 @@ function drawBubbleChart() {
   
     function zoom(event, d) {
       focus = d;
+      currentFocusDepth = d.depth; // <- Atualiza a profundidade atual
 
       if (d === root) {
         d3.selectAll(".legend-group")
@@ -3265,14 +3281,17 @@ function drawBubbleChart() {
             .attr("class", "bubble-text")
             .attr("transform", `translate(${(focus.x - view[0]) * (width/view[2])}, ${(focus.y - view[1]) * (width/view[2])})`)
             .selectAll("text")
+            
             .data(info)
             .join("text")
-              .attr("y", (d, i) => (i - info.length/2) * 50)
-              .attr("text-anchor", "middle")
-              .style("font-weight", "bold")
-              .style("font-size", "21px")
-              .style("fill", "black")
-              .text(d => d);
+            .attr("y", (d, i) => (i - info.length/2) * 50)
+            .attr("text-anchor", "middle")
+            .style("font-weight", "bold")
+            .style("font-size", "21px")
+            .style("fill", "black")
+            .text(d => d);
+
+        
         }
       });
     }
@@ -3339,63 +3358,6 @@ function drawBubbleChart() {
                 return d.originalFill ;  // Mantém a cor original ao sair
             });;
     });
-
-//     // Interação no texto destacado
-// d3.selectAll(".highlight-area")
-//     .on("mouseover", function(event) {
-//     const areas = d3.select(this).attr("data-area").split(",");
-
-//     // Destaca os círculos correspondentes
-//     svg.selectAll("circle")
-//         .filter(d => areas.includes(d.area.trim()))
-//         .transition()
-//         .duration(200)
-//         .attr("stroke", "#666")
-//         .attr("stroke-width", 3);
-
-//     // Esconde os não correspondentes
-//     svg.selectAll("circle")
-//     .filter(d => d.genero !== "Masculino")
-//             .transition()
-//             .duration(200)
-//             .attr("opacity", 0.1)
-//             .attr("stroke", "lightGray")
-//             .attr("stroke-width", 1);
-//         })
-//     .on("mouseout", function(event) {
-//     // Restaura todos os círculos
-//     svg.selectAll("circle")
-//         .transition()
-//         .duration(200)
-//         .attr("stroke", "#666")
-//         .attr("stroke-width", 1);
-//     });
-
-//     // Interação para destacar apenas bolhas azuis (ex: gênero masculino)
-// d3.selectAll(".highlight-area")
-//     .on("mouseover", function(event) {
-//     svg.selectAll("circle")
-//         .filter(d => d.genero === "Masculino")
-//         .transition()
-//         .duration(200)
-//         .attr("stroke", "#666")
-//         .attr("stroke-width", 3);
-
-//     svg.selectAll("circle")
-//         .filter(d => d.genero !== "Masculino")
-//         .transition()
-//         .duration(200)
-//         .attr("opacity", 0.1)
-//         .attr("stroke", "lightGray")
-//         .attr("stroke-width", 1);
-//     })
-//     .on("mouseout", function(event) {
-//     svg.selectAll("circle")
-//         .transition()
-//         .duration(200)
-//         .attr("stroke", "#666")
-//         .attr("stroke-width", 1);
-//     });
 
 
 

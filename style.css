@@ -8,7 +8,7 @@ body {
 
 
 
-#tooltip {
+/* #tooltip {
     position: absolute;
     background-color: white;
     border: 1px solid #ccc;
@@ -18,7 +18,24 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border-radius: 4px;
     z-index: 9999;
+} */
+
+#tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    display: none;
+    max-width: 220px;
+    line-height: 1.4em;
+    z-index: 10;
 }
+
 
 
 #graphic {
@@ -185,3 +202,6 @@ body {
     dominant-baseline: middle;
     transform: translateX(0);
 }
+
+
+
