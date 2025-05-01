@@ -178,3 +178,10 @@ body {
 .final-step.active {
     opacity: 1;
 }
+
+
+.highlight-legend {
+    text-anchor: middle;
+    dominant-baseline: middle;
+    transform: translateX(0);
+}

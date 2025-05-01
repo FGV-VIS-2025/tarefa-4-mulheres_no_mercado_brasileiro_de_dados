@@ -433,7 +433,6 @@ d3.selectAll(".highlight-mean-salary")
 
 }
 
-
 function salarioGenderProp() {
     clean();
 
@@ -1184,65 +1183,56 @@ function ensinoGenderProp() {
         });
 }
 
-function ensinoGenderAbsBar() {    
+function ensinoGenderAbsBar() {
+    let barsAnimated = false;
+
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset3.map(d => d.ensino);
-    
+
     clean(); // Limpa o SVG
-    
-    // Escala x para os grupos (categorias de ensino)
-    var x = d3.scaleBand()
-    .domain(groups)
-    .range([0, width])
-      .padding([0.2]);
 
-      // Criação do eixo X com animação
-      svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .style("opacity", 0)
-      .style("font-size", "12.1px")
-      .call(d3.axisBottom(x).tickSize(0))
-      .transition()
-      .duration(800)
-      .style("opacity", 1);
-      
-      // Escala Y
-      var y = d3.scaleLinear()
-      .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
-      .nice()
-      .range([height, 0]);
-      
-      // Criação do eixo Y com animação
-      svg.append("g")
-      .style("opacity", 0)
-      .call(d3.axisLeft(y))
-      .transition()
-      .duration(800)
-      .style("opacity", 1);
+    const x = d3.scaleBand()
+        .domain(groups)
+        .range([0, width])
+        .padding([0.2]);
 
-    // Grid horizontal cinza com transparência
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .style("opacity", 0)
+        .style("font-size", "12.1px")
+        .call(d3.axisBottom(x).tickSize(0))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
+
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(dataset3, d => Math.max(d.Masculino, d.Feminino))])
+        .nice()
+        .range([height, 0]);
+
+    svg.append("g")
+        .style("opacity", 0)
+        .call(d3.axisLeft(y))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
+
     svg.append("g")
         .attr("class", "grid")
         .attr("opacity", 0.2)
-        .call(d3.axisLeft(y)
-            .tickSize(-width)
-            .tickFormat("")
-        )
+        .call(d3.axisLeft(y).tickSize(-width).tickFormat(""))
         .selectAll("line")
         .attr("stroke", "gray");
 
-      
-      // Título do eixo X
-      svg.append("text")
-      .attr("text-anchor", "middle")
-      .attr("x", width / 2)
-      .attr("y", height + 40)
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
         .attr("font-size", "15px")
         .text("Formação")
         .style("opacity", 0.6);
-        
-        // Título do eixo Y
-        svg.append("text")
+
+    svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -1250,104 +1240,147 @@ function ensinoGenderAbsBar() {
         .attr("font-size", "14px")
         .text("Média salarial")
         .style("opacity", 0.6);
-        
-        // Escala interna para subgrupos (masculino/feminino dentro de cada grupo de ensino)
-    var xSubgroup = d3.scaleBand()
-      .domain(subgroups)
-      .range([0, x.bandwidth()])
-      .padding([0.05]);
 
-    // Cores
+    const xSubgroup = d3.scaleBand()
+        .domain(subgroups)
+        .range([0, x.bandwidth()])
+        .padding([0.05]);
+
     const color = d3.scaleOrdinal()
-      .domain(subgroups)
-      .range(["#1e90ff", "#ff69b4"]);
+        .domain(subgroups)
+        .range(["#1e90ff", "#ff69b4"]);
 
-    // Barras
-    svg.append("g")
-    .selectAll("g")
-    // Enter na data = loop grupo por grupo
-    .data(dataset3)
-    .enter()
-    .append("g")
-      .attr("transform", function(d) { return "translate(" + x(d.ensino) + ",0)"; })
-    .selectAll("rect")
-    .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-    .enter().append("rect")
-      .attr("x", function(d) { return xSubgroup(d.key); })
-      .attr("y", y(0)) // começa do eixo x (para animar)
-      .attr("width", xSubgroup.bandwidth())
-      .attr("height", 0) // começa com altura 0
-      .attr("fill", function(d) { return color(d.key); })
-      .transition()
-      .duration(1000)
-      .attr("y", function(d) { return y(d.value); })
-      .attr("height", function(d) { return height - y(d.value); });
+    const barGroups = svg.append("g")
+        .selectAll("g")
+        .data(dataset3)
+        .enter()
+        .append("g")
+        .attr("transform", function(d) { return "translate(" + x(d.ensino) + ",0)"; });
 
-    // Interação nas barras
-    svg.selectAll("g")
-      .selectAll("rect")
-      .on("mouseover", function(event, d) {
-        d3.select("#tooltip")
-            .style("display", "block")
-            .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
-        d3.select(this).attr("fill", "#339999");
-      })
-      .on("mousemove", function(event) {
-        d3.select("#tooltip")
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 20) + "px");
-      })
-      .on("mouseout", function(event, d) {
-        d3.select("#tooltip").style("display", "none");
-        d3.select(this).attr("fill", function(d) { return color(d.key); });
-      });
-
-    // Interação no texto destacado
-d3.selectAll(".highlight-education")
-.on("mouseover", function(event) {
-    const educations = d3.select(this).attr("data-education").split(",");
-
-    // Destaca as barras selecionadas
-    svg.selectAll("g")
-        .selectAll("rect")
-        .filter(function(d) {
-            return d && d.key && this.parentNode.__data__ && educations.includes(this.parentNode.__data__.ensino.trim());
+    barGroups.selectAll("rect")
+        .data(function(d) {
+            return subgroups.map(function(key) {
+                return { key: key, value: d[key] };
+            });
         })
+        .enter()
+        .append("rect")
+        .attr("x", d => xSubgroup(d.key))
+        .attr("y", y(0))
+        .attr("width", xSubgroup.bandwidth())
+        .attr("height", 0)
+        .attr("fill", d => color(d.key))
         .transition()
-        .duration(200)
-        .attr("opacity", 1) // Opacidade total para as barras destacadas
-        .attr("stroke", "black") // Aplica borda preta
-        .attr("stroke-width", 2); // Define a largura da borda
+        .duration(1000)
+        .attr("y", d => y(d.value))
+        .attr("height", d => height - y(d.value))
+        .on("end", function(_, i, nodes) {
+            if (i === nodes.length - 1) {
+                barsAnimated = true;
+            }
+        });
 
-    // Esbranquece as barras não selecionadas
     svg.selectAll("g")
         .selectAll("rect")
-        .filter(function(d) {
-            return d && d.key && this.parentNode.__data__ && !educations.includes(this.parentNode.__data__.ensino.trim());
+        .on("mouseover", function(event, d) {
+            if (!barsAnimated) return;
+            d3.select("#tooltip")
+                .style("display", "block")
+                .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
+            d3.select(this).attr("fill", "#339999");
         })
-        .transition()
-        .duration(200)
-        .attr("opacity", 0.2) // Diminui a opacidade para as barras não selecionadas
-        .attr("fill", "#d3d3d3") // Muda a cor para um tom de cinza para esbranquiçar
-        .attr("stroke", "none") // Remove borda
-        .attr("stroke-width", 0); // Remove a largura da borda
-})
-.on("mouseout", function(event) {
-    // Remove o fundo de destaque
-    svg.select("g.background-highlight").selectAll("rect").remove();
+        .on("mousemove", function(event) {
+            if (!barsAnimated) return;
+            d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", function(event, d) {
+            if (!barsAnimated) return;
+            d3.select("#tooltip").style("display", "none");
+            d3.select(this).attr("fill", d => color(d.key));
+        });
 
-    // Restaura todas as barras ao estado original
-    svg.selectAll("g")
-        .selectAll("rect")
-        .transition()
-        .duration(200)
-        .attr("opacity", 1) // Restaura a opacidade para todas as barras
-        .attr("fill", function(d) { return color(d.key); }) // Restaura a cor original
-        .attr("stroke", "none") // Remove borda
-        .attr("stroke-width", 0); // Remove a largura da borda
-});
+    d3.selectAll(".highlight-education")
+        .on("mouseover", function(event) {
+            if (!barsAnimated) return;
+            const educations = d3.select(this).attr("data-education").split(",");
+
+            svg.selectAll("g")
+                .selectAll("rect")
+                .filter(function(d) {
+                    return d && d.key && this.parentNode.__data__ && educations.includes(this.parentNode.__data__.ensino.trim());
+                })
+                .transition()
+                .duration(200)
+                .attr("opacity", 1)
+                .attr("stroke", "black")
+                .attr("stroke-width", 2);
+
+            svg.selectAll("g")
+                .selectAll("rect")
+                .filter(function(d) {
+                    return d && d.key && this.parentNode.__data__ && !educations.includes(this.parentNode.__data__.ensino.trim());
+                })
+                .transition()
+                .duration(200)
+                .attr("opacity", 0.2)
+                .attr("fill", "#d3d3d3")
+                .attr("stroke", "none")
+                .attr("stroke-width", 0);
+        })
+        .on("mouseout", function(event) {
+            if (!barsAnimated) return;
+        
+            svg.selectAll("g")
+                .selectAll("rect")
+                .transition()
+                .duration(200)
+                .attr("opacity", 1)
+                .attr("stroke", "none")
+                .attr("stroke-width", 0)
+                .attr("fill", function(d) {
+                    // Protege contra retângulos sem dados válidos
+                    return d && d.key ? color(d.key) : d3.select(this).attr("fill");
+                });
+        });
 
 
+    /////LEGENDA
+    const legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", "translate(50, 20)"); // ajuste conforme necessário
+
+
+// Rosa - Mulheres
+legend.append("rect")
+.attr("x", -8)
+.attr("y", -8)
+.attr("width", 16)
+.attr("height", 16)
+.attr("fill", "#ff69b4");
+
+legend.append("text")
+.attr("class", "highlight-legend")
+.attr("x", 40)
+.attr("y",2)
+.style("font-size", "13px")
+.text("Mulheres");
+
+// Azul - Homens
+legend.append("rect")
+.attr("x", -8)
+.attr("y", 22)
+.attr("width", 16)
+.attr("height", 16)
+.attr("fill", "#1e90ff");
+
+legend.append("text")
+.attr("class", "highlight-legend")
+.attr("x", 40)
+.attr("y", 30)
+.style("font-size", "13px")
+.text("Homens");
 }
 
 function experienciaGenderAbsBar() {
@@ -1516,19 +1549,56 @@ function experienciaGenderAbsBar() {
               .attr("stroke-width", 0);
       })
       .on("mouseout", function(event) {
-          if (!animationDone) return;
-
-          svg.selectAll("g")
-              .selectAll("rect")
-              .transition()
-              .duration(200)
-              .attr("opacity", 1)
-              .attr("fill", function(d) { return color(d.key); })
-              .attr("stroke", "none")
-              .attr("stroke-width", 0);
-      });
+        if (!animationDone) return;
+    
+        svg.selectAll("g")
+            .selectAll("rect")
+            .transition()
+            .duration(200)
+            .attr("opacity", 1)
+            .attr("stroke", "none")
+            .attr("stroke-width", 0)
+            .attr("fill", function(d) {
+                return d && d.key ? color(d.key) : d3.select(this).attr("fill");
+            });
+    });
 
       
+    /////LEGENDA
+    const legend = svg.append("g")
+            .attr("class", "legend")
+            .attr("transform", "translate(50, 20)"); // ajuste conforme necessário
+    
+    
+        // Rosa - Mulheres
+        legend.append("rect")
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", "#ff69b4");
+    
+        legend.append("text")
+        .attr("class", "highlight-legend")
+        .attr("x", 40)
+        .attr("y",2)
+        .style("font-size", "13px")
+        .text("Mulheres");
+    
+        // Azul - Homens
+        legend.append("rect")
+        .attr("x", -8)
+        .attr("y", 22)
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", "#1e90ff");
+    
+        legend.append("text")
+        .attr("class", "highlight-legend")
+        .attr("x", 40)
+        .attr("y", 30)
+        .style("font-size", "13px")
+        .text("Homens");
       
 }
 
@@ -1852,44 +1922,35 @@ function experienciaGenderProp() {
 }
 
 function nivelGenderAbsBar() {
+    let barsAnimated = false;
 
     const subgroups = ["Masculino", "Feminino"];
     const groups = dataset6.map(d => d.nivel);
 
     clean(); // Limpa o SVG
 
-    // Escala x para os grupos (categorias de ensino)
-    var x = d3.scaleBand()
+    const x = d3.scaleBand()
         .domain(groups)
         .range([0, width])
         .padding([0.2]);
 
-    // Escala y para os valores
-    var y = d3.scaleLinear()
+    const y = d3.scaleLinear()
         .domain([0, d3.max(dataset6, d => Math.max(d.Masculino, d.Feminino))])
         .nice()
         .range([height, 0]);
 
-    // Escala interna para subgrupos (Masculino/Feminino dentro de cada grupo)
-    var xSubgroup = d3.scaleBand()
+    const xSubgroup = d3.scaleBand()
         .domain(subgroups)
         .range([0, x.bandwidth()])
         .padding([0.05]);
 
-    // Cores
     const color = d3.scaleOrdinal()
         .domain(subgroups)
         .range(["#1e90ff", "#ff69b4"]);
 
-    
-
-
-    // Eixo X com animação de opacidade
     const xAxis = svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0);
-
-    
 
     xAxis.transition()
         .duration(800)
@@ -1897,7 +1958,6 @@ function nivelGenderAbsBar() {
         .call(d3.axisBottom(x).tickSize(0))
         .attr("font-size", "13.5px");
 
-    // Eixo Y com animação de opacidade
     const yAxis = svg.append("g")
         .style("opacity", 0);
 
@@ -1906,20 +1966,20 @@ function nivelGenderAbsBar() {
         .style("opacity", 1)
         .call(d3.axisLeft(y));
 
-    // Grid horizontal
     svg.append("g")
         .attr("class", "grid")
         .attr("opacity", 0.15)
         .call(
             d3.axisLeft(y)
-                .tickSize(-width)  // Linhas horizontais que atravessam o gráfico
-                .tickFormat("")    // Sem rótulo
+                .tickSize(-width)
+                .tickFormat("")
         )
         .selectAll("line")
         .attr("stroke", "gray");
 
+    let barsEnded = 0;
+    const totalBars = dataset6.length * subgroups.length;
 
-    // Criação das barras
     svg.append("g")
         .selectAll("g")
         .data(dataset6)
@@ -1927,10 +1987,10 @@ function nivelGenderAbsBar() {
         .append("g")
             .attr("transform", d => `translate(${x(d.nivel)},0)`)
             .each(function(d) {
-                const nivelAtual = d.nivel; // Salva o nível atual
+                const nivelAtual = d.nivel;
                 d3.select(this)
                     .selectAll("rect")
-                    .data(subgroups.map(key => ({ key: key, value: d[key], nivel: nivelAtual }))) // Passa o nível junto
+                    .data(subgroups.map(key => ({ key: key, value: d[key], nivel: nivelAtual })))
                     .enter()
                     .append("rect")
                         .attr("x", d => xSubgroup(d.key))
@@ -1938,15 +1998,20 @@ function nivelGenderAbsBar() {
                         .attr("width", xSubgroup.bandwidth())
                         .attr("height", 0)
                         .attr("fill", d => color(d.key))
-                        .attr("data-nivel", d => d.nivel) // Adiciona data-nivel no rect
+                        .attr("data-nivel", d => d.nivel)
                         .transition()
                         .duration(800)
                         .ease(d3.easeQuadIn)
                         .attr("y", d => y(d.value))
-                        .attr("height", d => height - y(d.value));
+                        .attr("height", d => height - y(d.value))
+                        .on("end", () => {
+                            barsEnded++;
+                            if (barsEnded === totalBars) {
+                                barsAnimated = true;
+                            }
+                        });
             });
 
-    // Título do eixo X
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
@@ -1955,7 +2020,6 @@ function nivelGenderAbsBar() {
         .text("Nível de Senioridade")
         .style("opacity", 0.6);
 
-    // Título do eixo Y
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
@@ -1965,12 +2029,10 @@ function nivelGenderAbsBar() {
         .text("Média salarial")
         .style("opacity", 0.6);
 
-    
-
-    // Interação nas barras
     svg.selectAll("g")
         .selectAll("rect")
         .on("mouseover", function(event, d) {
+            if (!barsAnimated) return;
             d3.select("#tooltip")
                 .style("display", "block")
                 .html(`<strong>Salário médio:</strong> R$ ${(Math.round((d.value) * 10) / 10)},00`);
@@ -1978,28 +2040,39 @@ function nivelGenderAbsBar() {
                 .attr("fill", "#339999");
         })
         .on("mousemove", function(event) {
+            if (!barsAnimated) return;
             d3.select("#tooltip")
                 .style("left", (event.pageX + 10) + "px")
                 .style("top", (event.pageY - 20) + "px");
         })
         .on("mouseout", function(event, d) {
+            if (!barsAnimated) return;
             d3.select("#tooltip").style("display", "none");
             d3.select(this)
                 .attr("fill", d => color(d.key));
         });
 
-    // Highlight no gráfico ao passar o mouse sobre o texto
     d3.selectAll(".highlight-income-jp")
         .on("mouseover", function(event) {
-            // Destaca as barras de Júnior e Pleno
+            if (!barsAnimated) return;
             svg.selectAll("rect")
                 .transition()
                 .duration(200)
-                .attr("opacity", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? 1 : 0.2)
-                .attr("stroke", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? "black" : "none")
-                .attr("stroke-width", d => (d.nivel === "Júnior" || d.nivel === "Pleno") ? 2 : 0);
+                .attr("opacity", function() {
+                    const nivel = this.getAttribute("data-nivel");
+                    return (nivel === "Júnior" || nivel === "Pleno") ? 1 : 0.2;
+                })
+                .attr("stroke", function() {
+                    const nivel = this.getAttribute("data-nivel");
+                    return (nivel === "Júnior" || nivel === "Pleno") ? "black" : "none";
+                })
+                .attr("stroke-width", function() {
+                    const nivel = this.getAttribute("data-nivel");
+                    return (nivel === "Júnior" || nivel === "Pleno") ? 2 : 0;
+                });
         })
         .on("mouseout", function(event) {
+            if (!barsAnimated) return;
             svg.selectAll("rect")
                 .transition()
                 .duration(200)
@@ -2008,18 +2081,24 @@ function nivelGenderAbsBar() {
                 .attr("stroke-width", 0);
         });
 
-    // Highlight no gráfico ao passar o mouse sobre o texto de "Sênior"
     d3.selectAll(".highlight-income-senior")
         .on("mouseover", function(event) {
-            // Destaca apenas as barras de Sênior
+            if (!barsAnimated) return;
             svg.selectAll("rect")
                 .transition()
                 .duration(200)
-                .attr("opacity", d => d.nivel === "Sênior" ? 1 : 0.2)
-                .attr("stroke", d => d.nivel === "Sênior" ? "black" : "none")
-                .attr("stroke-width", d => d.nivel === "Sênior" ? 2 : 0);
+                .attr("opacity", function() {
+                    return this.getAttribute("data-nivel") === "Sênior" ? 1 : 0.2;
+                })
+                .attr("stroke", function() {
+                    return this.getAttribute("data-nivel") === "Sênior" ? "black" : "none";
+                })
+                .attr("stroke-width", function() {
+                    return this.getAttribute("data-nivel") === "Sênior" ? 2 : 0;
+                });
         })
         .on("mouseout", function(event) {
+            if (!barsAnimated) return;
             svg.selectAll("rect")
                 .transition()
                 .duration(200)
@@ -2027,13 +2106,45 @@ function nivelGenderAbsBar() {
                 .attr("stroke", "none")
                 .attr("stroke-width", 0);
         });
+
+    const legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(50, 20)");
+
+    legend.append("rect")
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", "#ff69b4");
+
+    legend.append("text")
+        .attr("class", "highlight-legend")
+        .attr("x", 40)
+        .attr("y", 2)
+        .style("font-size", "13px")
+        .text("Mulheres");
+
+    legend.append("rect")
+        .attr("x", -8)
+        .attr("y", 22)
+        .attr("width", 16)
+        .attr("height", 16)
+        .attr("fill", "#1e90ff");
+
+    legend.append("text")
+        .attr("class", "highlight-legend")
+        .attr("x", 40)
+        .attr("y", 30)
+        .style("font-size", "13px")
+        .text("Homens");
 }
 
 function nivelGenderProp() {
     // Limpa o SVG
     clean(); 
 
-    // Escalas para os dois gráficos
+    // Escalas
     const x = d3.scaleBand()
         .domain(dataset7.map(d => d.nivel))
         .range([0, width])
@@ -2057,7 +2168,7 @@ function nivelGenderProp() {
         .nice()
         .range([height-400, 0]);
 
-    // Eixos com animação de opacidade
+    // Eixos
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
@@ -2074,7 +2185,7 @@ function nivelGenderProp() {
         .duration(800)
         .style("opacity", 1);
 
-    // Título do eixo X
+    // Título dos eixos
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
@@ -2083,7 +2194,6 @@ function nivelGenderProp() {
         .text("Nível de Senioridade")
         .style("opacity", 0.6);
 
-    // Título do eixo Y
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
@@ -2093,7 +2203,7 @@ function nivelGenderProp() {
         .text("Proporção (%)")
         .style("opacity", 0.6);
 
-    // Linhas com animação de desenhar
+    // Linhas
     const lineMasculino = d3.line()
         .x(d => xLine(d.nivel))
         .y(d => yLine(d.Masculino));
@@ -2128,7 +2238,7 @@ function nivelGenderProp() {
         .ease(d3.easeQuadIn)
         .attr("stroke-dashoffset", 0);
 
-    // Pontos nas linhas - masculino
+    // Pontos
     svg.selectAll(".circle-male")
         .data(dataset7)
         .enter()
@@ -2136,14 +2246,13 @@ function nivelGenderProp() {
         .attr("class", "circle-male")
         .attr("cx", d => xLine(d.nivel))
         .attr("cy", d => yLine(d.Masculino))
-        .attr("r", 0) // começa com raio 0
+        .attr("r", 0)
         .attr("fill", "#1e90ff")
         .transition()
         .duration(800)
         .ease(d3.easeQuadIn)
         .attr("r", 4);
 
-    // Pontos nas linhas - feminino
     svg.selectAll(".circle-female")
         .data(dataset7)
         .enter()
@@ -2151,14 +2260,14 @@ function nivelGenderProp() {
         .attr("class", "circle-female")
         .attr("cx", d => xLine(d.nivel))
         .attr("cy", d => yLine(d.Feminino))
-        .attr("r", 0) // começa com raio 0
+        .attr("r", 0)
         .attr("fill", "#ff69b4")
         .transition()
         .duration(800)
         .ease(d3.easeQuadIn)
         .attr("r", 4);
 
-    // Interações dos pontos - masculino
+    // Tooltips
     svg.selectAll(".circle-male")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -2184,7 +2293,6 @@ function nivelGenderProp() {
                 .attr("fill", "#1e90ff");
         });
 
-    // Interações dos pontos - feminino
     svg.selectAll(".circle-female")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -2211,32 +2319,35 @@ function nivelGenderProp() {
         });
 
     svg.append("g")
-    .style("opacity", 0)
-    .call(d3.axisLeft(yDiff).ticks(4))
-    .transition()
-    .duration(800)
-    .style("opacity", 1);
+        .style("opacity", 0)
+        .call(d3.axisLeft(yDiff).ticks(4))
+        .transition()
+        .duration(800)
+        .style("opacity", 1);
 
-     // Título do eixo Y
-     svg.append("text")
-     .attr("text-anchor", "middle")
-     .attr("transform", "rotate(-90)")
-     .attr("x", -40)
-     .attr("y", -50)
-     .attr("font-size", "14px")
-     .text("Diferença(%)")
-     .style("opacity", 0.6);
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -40)
+        .attr("y", -50)
+        .attr("font-size", "14px")
+        .text("Diferença(%)")
+        .style("opacity", 0.6);
 
-    // Barras de diferença (Feminino - Masculino) com animação
+    // 🔧 MODIFICAÇÃO 1: Desativa interação durante a animação
+    d3.selectAll(".highlight-senior1")
+        .style("pointer-events", "none");
+
+    // Barras de diferença com transição e sincronização
     svg.selectAll(".diff-bar")
         .data(dataset7)
         .enter()
         .append("rect")
         .attr("class", "diff-bar")
         .attr("x", d => x(d.nivel))
-        .attr("y", yDiff(0)) // começa no meio
+        .attr("y", yDiff(0))
         .attr("width", x.bandwidth())
-        .attr("height", 0) // altura inicial 0
+        .attr("height", 0)
         .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
         .attr("opacity", 0.5)
         .transition()
@@ -2245,9 +2356,15 @@ function nivelGenderProp() {
         .attr("y", d => d.Feminino - d.Masculino >= 0
             ? yDiff(d.Feminino - d.Masculino)
             : yDiff(0))
-        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+        .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)))
+        // 🔧 MODIFICAÇÃO 2: Reativa interação após a última barra
+        .on("end", function(_, i, nodes) {
+            if (i === nodes.length - 1) {
+                d3.selectAll(".highlight-senior1")
+                    .style("pointer-events", "all");
+            }
+        });
 
-    // Interação nas barras de diferença
     svg.selectAll(".diff-bar")
         .on("mouseover", function(event, d) {
             d3.select("#tooltip")
@@ -2267,67 +2384,59 @@ function nivelGenderProp() {
                 .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 
-    // Camada para fundo de destaque (antes das linhas e barras)
-const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
 
-// Interação no texto destacado
-d3.selectAll(".highlight-senior1")
-    .on("mouseover", function(event) {
-        const niveis = d3.select(this).attr("data-experience").split(",").map(Number);
+    d3.selectAll(".highlight-senior1")
+        .on("mouseover", function(event) {
+            const niveis = d3.select(this).attr("data-experience").split(",").map(Number);
 
-        const gruposSelecionados = dataset7.filter(d => 
-            niveis.includes(Number(d.nivel))
-        );
+            const gruposSelecionados = dataset7.filter(d => 
+                niveis.includes(Number(d.nivel))
+            );
 
-        if (gruposSelecionados.length === 0) return;
+            if (gruposSelecionados.length === 0) return;
 
-        const primeiroNivel = gruposSelecionados[0].nivel;
-        const ultimoNivel = gruposSelecionados[gruposSelecionados.length - 1].nivel;
+            const primeiroNivel = gruposSelecionados[0].nivel;
+            const ultimoNivel = gruposSelecionados[gruposSelecionados.length - 1].nivel;
 
-        const xInicio = x(primeiroNivel);
-        const xFim = x(ultimoNivel) + x.bandwidth();
+            const xInicio = x(primeiroNivel);
+            const xFim = x(ultimoNivel) + x.bandwidth();
 
-        backgroundHighlight.selectAll("rect").remove();
+            backgroundHighlight.selectAll("rect").remove();
 
-        backgroundHighlight.append("rect")
-            .attr("x", xInicio)
-            .attr("y", 0)
-            .attr("width", xFim - xInicio)
-            .attr("height", height)
-            .attr("fill", "#e0e0e0")
-            .attr("opacity", 0.4);
+            backgroundHighlight.append("rect")
+                .attr("x", xInicio)
+                .attr("y", 0)
+                .attr("width", xFim - xInicio)
+                .attr("height", height)
+                .attr("fill", "#e0e0e0")
+                .attr("opacity", 0.4);
 
-        // Destacar círculos (pontos) relacionados
-        svg.selectAll("circle")
-            .filter(d => niveis.includes(Number(d.nivel)))
-            .transition()
-            .duration(200)
-            .attr("r", 10);
+            svg.selectAll("circle")
+                .filter(d => niveis.includes(Number(d.nivel)))
+                .transition()
+                .duration(200)
+                .attr("r", 10);
 
-        // Clarear barras de diferença
-        svg.selectAll(".diff-bar")
-            .filter(d => niveis.includes(Number(d.nivel)))
-            .transition()
-            .duration(200);
-            // .attr("fill", "#c8c8c8");
-    })
-    .on("mouseout", function(event) {
-        backgroundHighlight.selectAll("rect").remove();
+            svg.selectAll(".diff-bar")
+                .filter(d => niveis.includes(Number(d.nivel)))
+                .transition()
+                .duration(200);
+        })
+        .on("mouseout", function(event) {
+            backgroundHighlight.selectAll("rect").remove();
 
-        svg.selectAll("circle")
-            .transition()
-            .duration(200)
-            .attr("r", 4);
+            svg.selectAll("circle")
+                .transition()
+                .duration(200)
+                .attr("r", 4);
 
-        svg.selectAll(".diff-bar")
-            .transition()
-            .duration(200)
-            .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
-            .attr("opacity", 0.5);
-    });
-
-
-        
+            svg.selectAll(".diff-bar")
+                .transition()
+                .duration(200)
+                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+                .attr("opacity", 0.5);
+        });
 }
 
 function wordCloud() {
@@ -2386,7 +2495,7 @@ function wordCloud() {
             .data(words)
             .join("text")
             .attr("font-size", d => d.size)
-            .attr("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"))
+            .attr("fill", "#339999")
             .attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
             .text(d => d.text)
             .on("mouseover", function (event, d) {
@@ -2405,7 +2514,7 @@ function wordCloud() {
             })
             .on("mouseout", function (event, d) {
                 tooltip.style("display", "none");
-                d3.select(this).style("fill", d => (d.Prop_mulher - d.Prop_homem >= 0 ? "#ff69b4" : "#1e90ff"));
+                d3.select(this).style("fill", "#339999");
             });
 
         // Interação com o texto HTML usando a classe "income"
@@ -2478,7 +2587,7 @@ function wordCloud() {
         .style("pointer-events", "none")
         .text("Mulheres");
 
-    // Botão para Mulheres
+    // Botão para Geral
     legend.append("rect")
         .attr("x", 0)
         .attr("y", 10)
@@ -2951,6 +3060,7 @@ function drawBubbleChart() {
         
 
     legend.append("text")
+        .attr("class", "highlight-legend")
         .attr("x", 20)
         .attr("y", 5)
         .style("font-size", "13px")
@@ -2964,6 +3074,7 @@ function drawBubbleChart() {
         .attr("fill", "lightblue"); // mesma cor usada para homens
 
     legend.append("text")
+        .attr("class", "highlight-legend")
         .attr("x", 20)
         .attr("y", 35)
         .style("font-size", "13px")
