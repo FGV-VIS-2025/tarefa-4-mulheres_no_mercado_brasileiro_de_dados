@@ -143,23 +143,6 @@ function initVis() {
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 
-// // Cria o SVG
-// function initVis() {
-//     svg = d3.select("#vis")
-//         .append("svg")
-//         // .attr("width", width + margin.left + margin.right)
-//         // .attr("height", height + margin.top + margin.bottom + 30)
-//         .style("width", "100%")
-//         .style("height", "auto")
-//         .append("g")
-//         .attr("transform", `translate(${margin.left}, ${margin.top})`);
-//     // d3.select("#vis").append("svg")
-//     // .attr("viewBox", "0 0 800 500")
-//     // .attr("preserveAspectRatio", "xMidYMid meet")
-//     // .style("width", "100%")
-//     // .style("height", "auto");
-
-
     // Define escalas compartilhadas
     x = d3.scaleBand()
         .domain(dataset.map(d => d.category))
@@ -186,13 +169,6 @@ function clean() {
     svg.selectAll("*").remove();
 }
 
-// function expandSVG() {
-//     d3.select("#vis svg")
-//         // .transition()
-//         // .duration(500)
-//         .attr("width", width * 2)   // aumenta a largura
-//         .attr("height", height * 2); // aumenta a altura
-// }
 
 function expandSVG() {
     const newWidth = width * 2;
@@ -456,6 +432,8 @@ d3.selectAll(".highlight-mean-salary")
 });
 
 }
+
+
 function salarioGenderProp() {
     clean();
 
@@ -502,8 +480,8 @@ function salarioGenderProp() {
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
-        .attr("y", height + 50)
-        .attr("font-size", "14px")
+        .attr("y", height + 40)
+        .attr("font-size", "15px")
         .text("Faixa Salarial")
         .style("opacity", 0.6);
 
@@ -658,6 +636,32 @@ function salarioGenderProp() {
     .duration(800)
     .style("opacity", 1);
 
+    // // Grid horizontal cinza com transparência
+    // svg.append("g")
+    //     .attr("class", "grid")
+    //     .attr("opacity", 0.1)
+    //     .call(d3.axisLeft(yLine)
+    //         .tickSize(-width)
+    //         .tickFormat("")
+    //     )
+    //     .selectAll("line")
+    //     .attr("stroke", "gray");
+
+    // // Grid horizontal para o gráfico de diferenças (barras)
+    // svg.append("g")
+    //     .attr("class", "grid-diff")
+    //     .attr("opacity", 0.1)
+    //     .call(d3.axisLeft(yDiff)
+    //         .tickValues([0, -2, -4])  // define os valores dos ticks
+    //         .tickSize(-width)        // desenha as linhas horizontais atravessando todo o gráfico
+    //         .tickFormat("")          // não mostra os rótulos dos ticks
+    //     )
+    //     .selectAll("line")
+    //     .attr("stroke", "gray");
+
+
+
+
      // Título do eixo Y
      svg.append("text")
      .attr("text-anchor", "middle")
@@ -684,6 +688,7 @@ function salarioGenderProp() {
         .ease(d3.easeQuadIn)
         .attr("y", d => d.Feminino - d.Masculino >= 0 ? yDiff(d.Feminino - d.Masculino) : yDiff(0))
         .attr("height", d => Math.abs(yDiff(d.Feminino - d.Masculino) - yDiff(0)));
+
 
     // Interação barras
     svg.selectAll(".diff-bar")
@@ -905,6 +910,7 @@ function ensinoGenderProp() {
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0)
         .call(d3.axisBottom(x))
+        .style("font-size", "11.7px")
         .transition()
         .duration(800)
         .style("opacity", 1);
@@ -920,8 +926,8 @@ function ensinoGenderProp() {
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
-        .attr("y", height + 50)
-        .attr("font-size", "14px")
+        .attr("y", height + 40)
+        .attr("font-size", "15px")
         .text("Formação")
         .style("opacity", 0.6);
 
@@ -951,7 +957,7 @@ function ensinoGenderProp() {
         .attr("stroke", "#1e90ff")
         .attr("fill", "none")
         .attr("stroke-width", 2)
-        .attr("pointer-events", "stroke") // << ADICIONADO
+        .attr("pointer-events", "stroke")
         .on("mouseover", function(event) {
             d3.select("#tooltip")
                 .style("display", "block")
@@ -1194,6 +1200,7 @@ function ensinoGenderAbsBar() {
       svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .style("opacity", 0)
+      .style("font-size", "12.1px")
       .call(d3.axisBottom(x).tickSize(0))
       .transition()
       .duration(800)
@@ -1212,13 +1219,25 @@ function ensinoGenderAbsBar() {
       .transition()
       .duration(800)
       .style("opacity", 1);
+
+    // Grid horizontal cinza com transparência
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("opacity", 0.2)
+        .call(d3.axisLeft(y)
+            .tickSize(-width)
+            .tickFormat("")
+        )
+        .selectAll("line")
+        .attr("stroke", "gray");
+
       
       // Título do eixo X
       svg.append("text")
       .attr("text-anchor", "middle")
       .attr("x", width / 2)
-      .attr("y", height + 50)
-        .attr("font-size", "14px")
+      .attr("y", height + 40)
+        .attr("font-size", "15px")
         .text("Formação")
         .style("opacity", 0.6);
         
@@ -1367,6 +1386,19 @@ function experienciaGenderAbsBar() {
       .transition()
       .duration(800)
       .style("opacity", 1);
+
+    // Grid horizontal
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("opacity", 0.15)
+        .call(
+            d3.axisLeft(y)
+                .tickSize(-width)  // Linhas horizontais que atravessam o gráfico
+                .tickFormat("")    // Sem rótulo
+        )
+        .selectAll("line")
+        .attr("stroke", "gray");
+
 
 
     // Título do eixo X
@@ -1525,6 +1557,8 @@ function experienciaGenderProp() {
         .transition()
         .duration(800)
         .style("opacity", 1);
+
+    
 
     chartGroup.append("g")
         .style("opacity", 0)
@@ -1838,10 +1872,15 @@ function nivelGenderAbsBar() {
         .domain(subgroups)
         .range(["#1e90ff", "#ff69b4"]);
 
+    
+
+
     // Eixo X com animação de opacidade
     const xAxis = svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .style("opacity", 0);
+
+    
 
     xAxis.transition()
         .duration(800)
@@ -1857,6 +1896,19 @@ function nivelGenderAbsBar() {
         .duration(800)
         .style("opacity", 1)
         .call(d3.axisLeft(y));
+
+    // Grid horizontal
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("opacity", 0.15)
+        .call(
+            d3.axisLeft(y)
+                .tickSize(-width)  // Linhas horizontais que atravessam o gráfico
+                .tickFormat("")    // Sem rótulo
+        )
+        .selectAll("line")
+        .attr("stroke", "gray");
+
 
     // Criação das barras
     svg.append("g")
@@ -1903,6 +1955,8 @@ function nivelGenderAbsBar() {
         .attr("font-size", "14px")
         .text("Média salarial")
         .style("opacity", 0.6);
+
+    
 
     // Interação nas barras
     svg.selectAll("g")
