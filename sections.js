@@ -2384,59 +2384,72 @@ function nivelGenderProp() {
                 .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"));
         });
 
-    const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
-
-    d3.selectAll(".highlight-senior1")
-        .on("mouseover", function(event) {
-            const niveis = d3.select(this).attr("data-experience").split(",").map(Number);
-
-            const gruposSelecionados = dataset7.filter(d => 
-                niveis.includes(Number(d.nivel))
-            );
-
-            if (gruposSelecionados.length === 0) return;
-
-            const primeiroNivel = gruposSelecionados[0].nivel;
-            const ultimoNivel = gruposSelecionados[gruposSelecionados.length - 1].nivel;
-
-            const xInicio = x(primeiroNivel);
-            const xFim = x(ultimoNivel) + x.bandwidth();
-
-            backgroundHighlight.selectAll("rect").remove();
-
-            backgroundHighlight.append("rect")
-                .attr("x", xInicio)
-                .attr("y", 0)
-                .attr("width", xFim - xInicio)
-                .attr("height", height)
-                .attr("fill", "#e0e0e0")
-                .attr("opacity", 0.4);
-
-            svg.selectAll("circle")
-                .filter(d => niveis.includes(Number(d.nivel)))
-                .transition()
-                .duration(200)
-                .attr("r", 10);
-
-            svg.selectAll(".diff-bar")
-                .filter(d => niveis.includes(Number(d.nivel)))
-                .transition()
-                .duration(200);
-        })
-        .on("mouseout", function(event) {
-            backgroundHighlight.selectAll("rect").remove();
-
-            svg.selectAll("circle")
-                .transition()
-                .duration(200)
-                .attr("r", 4);
-
-            svg.selectAll(".diff-bar")
-                .transition()
-                .duration(200)
-                .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
-                .attr("opacity", 0.5);
-        });
+        // Camada para fundo de destaque (antes das linhas e barras)
+        const backgroundHighlight = svg.append("g").attr("class", "background-highlight");
+        
+        // Interação no texto destacado
+        d3.selectAll(".highlight-senior1")
+            .on("mouseover", function(event) {
+                const niveis = d3.select(this).attr("data-experience").split(",");
+    
+                const gruposSelecionados = dataset7.filter(d =>
+                    niveis.includes(d.nivel)
+                );
+    
+                if (gruposSelecionados.length === 0) return;
+    
+                const primeiroNivel = gruposSelecionados[0].nivel;
+                const ultimoNivel = gruposSelecionados[gruposSelecionados.length - 1].nivel;
+    
+                const xInicio = x(primeiroNivel);
+                const xFim = x(ultimoNivel) + x.bandwidth();
+    
+                backgroundHighlight.selectAll("rect").remove();
+    
+                backgroundHighlight.append("rect")
+                    .attr("x", xInicio)
+                    .attr("y", 0)
+                    .attr("width", xFim - xInicio)
+                    .attr("height", height)
+                    .attr("fill", "#e0e0e0")
+                    .attr("opacity", 0.4);
+    
+                // Destacar círculos (pontos) relacionados
+                svg.selectAll(".circle-male, .circle-female")
+                    .each(function(d) {
+                        if (niveis.includes(d.nivel)) {
+                            d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .attr("r", 10);
+                        }
+                    });
+    
+                // Clarear barras de diferença
+                svg.selectAll(".diff-bar")
+                    .each(function(d) {
+                        if (niveis.includes(d.nivel)) {
+                            d3.select(this)
+                                .transition()
+                                .duration(200)
+                                // .attr("fill", "#c8c8c8");
+                        }
+                    });
+            })
+            .on("mouseout", function() {
+                backgroundHighlight.selectAll("rect").remove();
+    
+                svg.selectAll(".circle-male, .circle-female")
+                    .transition()
+                    .duration(200)
+                    .attr("r", 4);
+    
+                svg.selectAll(".diff-bar")
+                    .transition()
+                    .duration(200)
+                    .attr("fill", d => (d.Feminino - d.Masculino >= 0 ? "#ff69b4" : "#1e90ff"))
+                    .attr("opacity", 0.5);
+            });
 }
 
 function wordCloud() {
@@ -3061,8 +3074,8 @@ function drawBubbleChart() {
 
     legend.append("text")
         .attr("class", "highlight-legend")
-        .attr("x", 20)
-        .attr("y", 5)
+        .attr("x", 40)
+        .attr("y", 2)
         .style("font-size", "13px")
         .text("Mulheres");
 
@@ -3075,8 +3088,8 @@ function drawBubbleChart() {
 
     legend.append("text")
         .attr("class", "highlight-legend")
-        .attr("x", 20)
-        .attr("y", 35)
+        .attr("x", 38)
+        .attr("y", 31)
         .style("font-size", "13px")
         .text("Homens");
 
@@ -3130,6 +3143,9 @@ function drawBubbleChart() {
       .join("circle")
         .attr("fill", d => d.children ? "#F2F1F0" : d.data.genero === "Feminino" ? "#F2A0CD" : "lightBlue") // #63B0F2
         .attr("stroke", "#666")
+        .each(function(d) {
+            d.originalFill = d3.select(this).style("fill");  // Salva a cor original
+        })
         // .on("mouseover", function() { d3.select(this).attr("stroke", "#000").attr("stroke-width", 2); })
         .on("mouseover", function(event, d) {
             d3.select(this)
@@ -3260,6 +3276,129 @@ function drawBubbleChart() {
         }
       });
     }
+
+
+    // 4. Interação entre texto e gráfico
+    d3.selectAll(".highlight-area_men")
+        .on("mouseover", function() {
+            const area = d3.select(this).attr("data-area");
+            
+            // Destacar apenas os círculos daquela área
+            g.selectAll("circle")
+                .transition()
+                .duration(300)
+                .style("opacity", d => d.data && d.data.genero === area ? 3 : 0.5)
+                .attr("stroke", d => d.data && d.data.genero === area ? "black" : "gray")
+                .attr("stroke-width", d => d.data && d.data.genero === area ? 2 : 1)
+                .attr("fill", d => d.data && d.data.genero === area
+                    ? "#66b3ff" // Escurece o tom de azul para os círculos da área
+                    :d.originalFill   // Mantém a cor original para os outros círculos
+                )
+                d3.select(".label-" + d.data.name.replace(/\s+/g, "-")).style("font-weight", "bold");
+        })
+        .on("mouseout", function() {
+            // Restaurar a opacidade normal
+            g.selectAll("circle")
+                .transition()
+                .duration(200)
+                .style("opacity", 1)
+                .attr("stroke", "#666")
+                .attr("stroke-width", 1)
+                .attr("fill", function(d) {
+                    return d.originalFill ;  // Mantém a cor original ao sair
+                });;
+        });
+
+
+        // 4. Interação entre texto e gráfico
+    d3.selectAll(".highlight-area_women")
+    .on("mouseover", function() {
+        const area = d3.select(this).attr("data-area");
+        
+        // Destacar apenas os círculos daquela área
+        g.selectAll("circle")
+            .transition()
+            .duration(300)
+            .style("opacity", d => d.data && d.data.genero === area ? 3 : 0.5)
+            .attr("stroke", d => d.data && d.data.genero === area ? "black" : "gray")
+            .attr("stroke-width", d => d.data && d.data.genero === area ? 2 : 1)
+            .attr("fill", d => d.data && d.data.genero === area
+                ? "#ff73b9" // Escurece o tom de azul para os círculos da área
+                :d.originalFill   // Mantém a cor original para os outros círculos
+            );
+    })
+    .on("mouseout", function() {
+        // Restaurar a opacidade normal
+        g.selectAll("circle")
+            .transition()
+            .duration(200)
+            .style("opacity", 1)
+            .attr("stroke", "#666")
+            .attr("stroke-width", 1)
+            .attr("fill", function(d) {
+                return d.originalFill ;  // Mantém a cor original ao sair
+            });;
+    });
+
+//     // Interação no texto destacado
+// d3.selectAll(".highlight-area")
+//     .on("mouseover", function(event) {
+//     const areas = d3.select(this).attr("data-area").split(",");
+
+//     // Destaca os círculos correspondentes
+//     svg.selectAll("circle")
+//         .filter(d => areas.includes(d.area.trim()))
+//         .transition()
+//         .duration(200)
+//         .attr("stroke", "#666")
+//         .attr("stroke-width", 3);
+
+//     // Esconde os não correspondentes
+//     svg.selectAll("circle")
+//     .filter(d => d.genero !== "Masculino")
+//             .transition()
+//             .duration(200)
+//             .attr("opacity", 0.1)
+//             .attr("stroke", "lightGray")
+//             .attr("stroke-width", 1);
+//         })
+//     .on("mouseout", function(event) {
+//     // Restaura todos os círculos
+//     svg.selectAll("circle")
+//         .transition()
+//         .duration(200)
+//         .attr("stroke", "#666")
+//         .attr("stroke-width", 1);
+//     });
+
+//     // Interação para destacar apenas bolhas azuis (ex: gênero masculino)
+// d3.selectAll(".highlight-area")
+//     .on("mouseover", function(event) {
+//     svg.selectAll("circle")
+//         .filter(d => d.genero === "Masculino")
+//         .transition()
+//         .duration(200)
+//         .attr("stroke", "#666")
+//         .attr("stroke-width", 3);
+
+//     svg.selectAll("circle")
+//         .filter(d => d.genero !== "Masculino")
+//         .transition()
+//         .duration(200)
+//         .attr("opacity", 0.1)
+//         .attr("stroke", "lightGray")
+//         .attr("stroke-width", 1);
+//     })
+//     .on("mouseout", function(event) {
+//     svg.selectAll("circle")
+//         .transition()
+//         .duration(200)
+//         .attr("stroke", "#666")
+//         .attr("stroke-width", 1);
+//     });
+
+
+
   }
   
 
