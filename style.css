@@ -203,5 +203,9 @@ body {
     transform: translateX(0);
 }
 
-
-
+#select {
+    display: block;
+    margin: 20px;
+    padding: 10px;
+    font-size: 16px;
+}
