@@ -213,12 +213,6 @@ function drawChart(dataset, media, cargo) {
         .range([height,0])
         .padding(0);
 
-    const svg = d3.select("#vis svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
 
     // eixo x embaixo
     svg.append("g")
@@ -243,39 +237,6 @@ function drawChart(dataset, media, cargo) {
         .attr("fill", "#007af2")
         .text("Homens");
 
-
-    // Criação do zoom
-    const zoom = d3.zoom()
-        .scaleExtent([1, 10]) // Define o nível de zoom
-        .translateExtent([[0, 0], [width, height]]) // Limita a área de translação
-        .on("zoom", zoomed);
-
-    const chartGroup = svg.append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-      
-      chartGroup.call(zoom);
-      
-    function zoomed(event) {
-        const transform = event.transform;
-        const newX = transform.rescaleX(x);
-        const newY = transform.rescaleY(y);
-    
-        // Atualiza as barras e os eixos
-        chartGroup.selectAll(".bar-f")
-            .attr("x", d => newX(d.Feminino))
-            .attr("width", d => newX(0) - newX(d.Feminino))
-            .attr("y", d => newY(d.salario))
-            .attr("height", newY.bandwidth() + 0.5);
-    
-        chartGroup.selectAll(".bar-m")
-            .attr("x", newX(0))
-            .attr("width", d => newX(d.Masculino) - newX(0))
-            .attr("y", d => newY(d.salario))
-            .attr("height", newY.bandwidth() + 0.5);
-    
-        chartGroup.selectAll(".axis.x-axis").call(d3.axisBottom(newX).ticks(5).tickFormat(d => Math.abs(d)));
-        chartGroup.selectAll(".axis.y-axis").call(d3.axisLeft(newY));
-    }
     
 
     // Título do eixo X
