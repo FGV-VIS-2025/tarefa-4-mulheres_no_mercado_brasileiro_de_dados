@@ -254,9 +254,10 @@ function drawChart(dataset, media, cargo) {
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
         .attr("y", -10)
-        .attr("font-size", "15px")
+        .attr("font-size", "16px")
         .attr("class", "axis y-axis")
-        .text("Média Salarial");
+        .text("Média Salarial")
+        .style("opacity", 0.6);
 
     // define escala y contínua para a linha de salário médio
     const maxSalario = d3.max(data_pyr, d => d.salario);
