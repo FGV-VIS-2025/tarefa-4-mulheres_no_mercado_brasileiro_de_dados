@@ -22,7 +22,7 @@ const height = 600 - margin.top - margin.bottom;
 let x, y, radius, color;
 
 // Carregar dados
-d3.csv("grouped_income_gender.csv").then(data => {
+d3.csv("data/grouped_income_gender.csv").then(data => {
     dataset1 = data.map(d => ({
         faixa_salarial: d.salario,
         Masculino: +d.Masculino,
@@ -31,7 +31,7 @@ d3.csv("grouped_income_gender.csv").then(data => {
     }));
 });
 
-d3.csv("motivos_satisfacao.csv").then(data => {
+d3.csv("data/motivos_satisfacao.csv").then(data => {
     dataset8 = data.map(d => ({
         motivo: d.motivo,
         Prop_homem: +d.Prop_homem,
@@ -40,21 +40,21 @@ d3.csv("motivos_satisfacao.csv").then(data => {
     }));
 });
 
-d3.csv("motivo_homem.csv").then(data => {
+d3.csv("data/motivo_homem.csv").then(data => {
     dataset9 = data.map(d => ({
         motivo: d.motivo,
         quantidade: +d.quantidade
     }));
 });
 
-d3.csv("motivo_mulher.csv").then(data => {
+d3.csv("data/motivo_mulher.csv").then(data => {
     dataset10 = data.map(d => ({
         motivo: d.motivo,
         quantidade: +d.quantidade
     }));
 });
 
-d3.csv("grouped_salario_prop.csv").then(data => {
+d3.csv("data/grouped_salario_prop.csv").then(data => {
     dataset2 = data.map(d => ({
         ensino: d.Ensino.trim(),
         Masculino: +d.Masculino,
@@ -63,7 +63,7 @@ d3.csv("grouped_salario_prop.csv").then(data => {
     }));
 });
 
-d3.csv("grouped_salario_abs.csv").then(data => {
+d3.csv("data/grouped_salario_abs.csv").then(data => {
     dataset3 = data.map(d => ({
         ensino: d.Ensino.trim(),
         Masculino: +d.Masculino,
@@ -71,7 +71,7 @@ d3.csv("grouped_salario_abs.csv").then(data => {
     }));
 });
 
-d3.csv("income_gender_experience.csv").then(data => {
+d3.csv("data/income_gender_experience.csv").then(data => {
     dataset4 = data.map(d => ({
         experiencia: d.experiencia_anos,
         Masculino: +d.Masculino,
@@ -80,7 +80,7 @@ d3.csv("income_gender_experience.csv").then(data => {
     }));
 });
 
-d3.csv("income_gender_experience_prop.csv").then(data => {
+d3.csv("data/income_gender_experience_prop.csv").then(data => {
     dataset5 = data.map(d => ({
         experiencia: d.experiencia_anos,
         Masculino: +d.Masculino,
@@ -89,7 +89,7 @@ d3.csv("income_gender_experience_prop.csv").then(data => {
     }));
 });
 
-d3.csv("gender_nivel_abs.csv").then(data => {
+d3.csv("data/gender_nivel_abs.csv").then(data => {
     dataset6 = data.map(d => ({
         nivel: d.Nivel,
         Masculino: +d.Masculino,
@@ -98,7 +98,7 @@ d3.csv("gender_nivel_abs.csv").then(data => {
     }));
 });
 
-d3.csv("gender_nivel_prop.csv").then(data => {
+d3.csv("data/gender_nivel_prop.csv").then(data => {
     dataset7 = data.map(d => ({
         nivel: d.Nivel,
         Masculino: +d.Masculino,
@@ -107,7 +107,7 @@ d3.csv("gender_nivel_prop.csv").then(data => {
     }));
 });
 
-d3.csv("gender_pyramid.csv").then(data => {
+d3.csv("data/gender_pyramid.csv").then(data => {
     data_pyr = data.map(d => ({
         salario: +d.salario,
         Feminino: -+d.Feminino,
