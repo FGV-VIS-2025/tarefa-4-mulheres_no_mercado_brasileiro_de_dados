@@ -95,7 +95,8 @@ O trabalho foi desenvolido em conjunto de forma bem equilibrada e cooperativa, d
   - Esqueleto do sitema de rolagem da página 
   - Gráfico de bolhas e suas interações
   - Parte das interações texto-visualização
-  - Designe da página
+  - Animações de rolagem da página
+  - Design da página
 
 - #### Mariana Fernandes Rocha
   - Gráfico de pirâmide e suas interações
