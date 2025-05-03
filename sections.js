@@ -213,6 +213,7 @@ function drawChart(dataset, media, cargo) {
         .range([height,0])
         .padding(0);
 
+
     // eixo x embaixo
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
@@ -235,6 +236,8 @@ function drawChart(dataset, media, cargo) {
         .attr("class", "axis y-axis")
         .attr("fill", "#007af2")
         .text("Homens");
+
+    
 
     // Título do eixo X
     svg.append("text")
@@ -335,8 +338,12 @@ function drawChart(dataset, media, cargo) {
                  <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
                  <strong>Quantidade:</strong> ${-d.Feminino}
              `);
-         d3.select(this)
-             .attr("fill", "#339999");
+        // Destaca todas as barras que possuem o mesmo intervalo de min e max
+        d3.selectAll(".bar-f")
+            .filter(function(e) { return e.min === d.min && e.max === d.max; }) // Filtra as barras com o mesmo intervalo
+            .attr("fill", "#E1006D"); // #0040A6 Destaca essas barras // Destaca essas barras
+        //  d3.select(this)
+        //      .attr("fill", "#339999");
      })
      .on("mousemove", function(event) {
          d3.select("#tooltip")
@@ -345,7 +352,8 @@ function drawChart(dataset, media, cargo) {
      })
      .on("mouseout", function() {
          d3.select("#tooltip").style("display", "none");
-         d3.select(this).attr("fill", "#ff69b4");
+        //  d3.select(this).attr("fill", "#ff69b4");
+        d3.selectAll(".bar-f").attr("fill", "#ff69b4");
      })
      .transition()
      .duration(1000)
@@ -371,8 +379,11 @@ function drawChart(dataset, media, cargo) {
                      <strong>Salário entre :</strong> R$ ${d.min} e R$ ${d.max}<br>
                      <strong>Quantidade:</strong> ${d.Masculino}
                  `);
-             d3.select(this)
-                 .attr("fill", "#339999");
+                 d3.selectAll(".bar-m")
+                 .filter(function(e) { return e.min === d.min && e.max === d.max; }) // Filtra as barras com o mesmo intervalo
+                 .attr("fill", "rgb(13, 99, 184)"); //
+            //  d3.select(this)
+            //      .attr("fill", "#339999");
          })
          .on("mousemove", function(event) {
              d3.select("#tooltip")
@@ -381,7 +392,9 @@ function drawChart(dataset, media, cargo) {
          })
          .on("mouseout", function() {
              d3.select("#tooltip").style("display", "none");
-             d3.select(this).attr("fill", "#1e90ff");
+            //  d3.select(this).attr("fill", "#1e90ff");
+            d3.selectAll(".bar-m").attr("fill", "#1e90ff"); //rgb(11, 73, 134)
+
          })
          .transition()
          .duration(1000)
