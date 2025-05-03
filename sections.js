@@ -274,14 +274,14 @@ function drawChart(dataset, media, cargo) {
     d3.selectAll(".highlight-mean-salary")
     .on("mouseover", function(event) {
     // Quando passar o mouse, destaca as linhas de salário médio
-    svg.selectAll(".mean-salary-line")
+    svg.selectAll(".ref-mean-salary-line")
     .attr("stroke", "red")
         .attr("stroke-width", 4)
         .attr("stroke-opacity", 1); // aumenta a opacidade
     })
     .on("mouseout", function(event) {
         // Quando tirar o mouse, volta para o estilo normal
-        svg.selectAll(".mean-salary-line")
+        svg.selectAll(".ref-mean-salary-line")
         .attr("stroke", "black")
         .attr("stroke-width", 2)
         .attr("stroke-opacity", 0.5);
@@ -577,6 +577,45 @@ function drawChart(dataset, media, cargo) {
         .on("mouseout", function() {
             d3.select("#tooltip").style("display", "none");
         });
+
+              // Legenda para as linhas de salário médio
+              svg.append("line")
+              .attr("class", "media-line")
+              .attr("x1", width - 200) // Posição horizontal
+              .attr("x2", width - 185) // Posição horizontal
+              .attr("y1", height - 500) // Posição vertical
+              .attr("y2", height - 500) // Posição vertical
+              .attr("stroke", "black")
+              .attr("stroke-width", 3)
+              .attr("stroke-dasharray", "4,4"); // Linha pontilhada para o salário médio geral
+      
+              svg.append("text")
+              .attr("class", "media-line")
+              .attr("x", width - 180) // Posição horizontal para o texto
+              .attr("y", height - 500) // Posição vertical para o texto
+              .attr("text-anchor", "start")
+              .attr("font-size", "12px")
+              .text("Salário médio geral")
+              .attr("alignment-baseline", "middle");
+      
+              // Linha pontilhada para o salário médio do cargo
+              svg.append("line")
+              .attr("class", "media-line")
+              .attr("x1", width - 200)
+              .attr("x2", width - 185)
+              .attr("y1", height - 480)
+              .attr("y2", height - 480)
+              .attr("stroke", "black")
+              .attr("stroke-width", 3); // Linha pontilhada para o salário médio do cargo
+      
+              svg.append("text")
+              .attr("class", "media-line")
+              .attr("x", width - 180)
+              .attr("y", height - 480)
+              .attr("text-anchor", "start")
+              .attr("font-size", "12px")
+              .text(`Salário médio ${cargo}`)
+              .attr("alignment-baseline", "middle");
         
     }
     
